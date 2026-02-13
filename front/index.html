@@ -184,6 +184,10 @@
             <h3>Inverter Freq (Hz)</h3>
             <p id="inverterFrequency">--</p>
           </div>
+          <div class="card">
+            <h3>Inverter Tempture (C)</h3>
+            <p id="inverterTempture">--</p>
+          </div>
           <!-- <div class="card">
             <h3>Line 1 Power (W)</h3>
             <p id="powerL1">--</p>
@@ -222,7 +226,7 @@
         // Calcula SOC basado en voltage
         function calculateBatterySOC(voltage) {
           const Vmin = 44.8; // voltaje descarga mínima
-          const Vmax = 53.5; // voltaje máxima
+          const Vmax = 53; // voltaje máxima
           let soc = ((voltage - Vmin) / (Vmax - Vmin)) * 100;
           soc = Math.max(0, Math.min(100, soc)); // limitar entre 0 y 100%
           return Math.round(soc);
@@ -255,6 +259,9 @@
 
         document.getElementById("inverterFrequency").textContent =
           data.inverterFrequency;
+
+        document.getElementById("inverterTempture").textContent =
+          data.acRadiatorTemperature;
 
         //document.getElementById("powerL1").textContent = data.powerL1;
         //document.getElementById("currentL1").textContent = data.currentL1;
