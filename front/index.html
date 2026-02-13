@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Must Inverter Dashboard</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
+
+      body {
+        font-family: "Roboto", sans-serif;
+        margin: 0;
+        background: #f4f6f8;
+        color: #333;
+      }
+
+      header {
+        background: #0077cc;
+        color: white;
+        padding: 1rem;
+        text-align: center;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      }
+
+      main {
+        padding: 1rem;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        max-width: 1200px;
+        margin: auto;
+      }
+
+      .group {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .group h2 {
+        margin-top: 0;
+        font-size: 1.2rem;
+        color: #0077cc;
+        border-bottom: 2px solid #0077cc;
+        padding-bottom: 0.5rem;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .card {
+        background: #fdfdfd;
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        position: relative;
+        transition: transform 0.2s;
+      }
+
+      .card:hover {
+        transform: translateY(-4px);
+      }
+
+      .card h3 {
+        margin: 0;
+        font-size: 0.9rem;
+        color: #555;
+      }
+
+      .card p {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin: 0.5rem 0 0 0;
+      }
+
+      /* Battery circle */
+      .circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: conic-gradient(#00cc66 0% 0%, #ddd 0% 100%);
+        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #333;
+        font-size: 1rem;
+        transition: background 0.5s;
+      }
+
+      /* Colors by state */
+      .state-offgrid {
+        color: #ff9900;
+      }
+      .state-charging {
+        color: #00cc66;
+      }
+      .state-discharging {
+        color: #ff3300;
+      }
+
+      @media (max-width: 600px) {
+        .cards {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Must Inverter Dashboard</h1>
+    </header>
+
+    <main>
+      <!-- PV Group -->
+      <div class="group" id="pvGroup">
+        <h2>Solar PV</h2>
+        <div class="cards">
+          <div class="card">
+            <h3>MPPT State</h3>
+            <p id="MpptState">--</p>
+          </div>
+          <div class="card">
+            <h3>PV Voltage (V)</h3>
+            <p id="PvVoltage">--</p>
+          </div>
+          <div class="card">
+            <h3>Charger Power (W)</h3>
+            <p id="ChargerPower">--</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Battery Group -->
+      <div class="group" id="batteryGroup">
+        <h2>Battery</h2>
+        <div class="cards">
+          <div class="card">
+            <h3>Battery Voltage (V)</h3>
+            <p id="batteryVoltage">--</p>
+          </div>
+          <div class="card">
+            <h3>Battery Current (A)</h3>
+            <p id="batteryCurrent">--</p>
+          </div>
+          <div class="card">
+            <h3>Battery Power (W)</h3>
+            <p id="batteryPower">--</p>
+          </div>
+          <div class="card">
+            <h3>Battery SOC</h3>
+            <div id="BMS_Battery_SOC_Circle" class="circle">--%</div>
+          </div>
+          <div class="card">
+            <h3>Battery Direction</h3>
+            <p id="batteryDirection">--</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Load Group -->
+      <div class="group" id="loadGroup">
+        <h2>Inverter</h2>
+        <div class="cards">
+          <div class="card">
+            <h3>Total Load Power (W)</h3>
+            <p id="loadPower">--</p>
+          </div>
+          <div class="card">
+            <h3>Total Load %</h3>
+            <p id="loadPercent">--</p>
+          </div>
+          <div class="card">
+            <h3>Inverter Voltage (V)</h3>
+            <p id="inverterVoltage">--</p>
+          </div>
+          <div class="card">
+            <h3>Inverter Freq (Hz)</h3>
+            <p id="inverterFrequency">--</p>
+          </div>
+          <div class="card">
+            <h3>Line 1 Power (W)</h3>
+            <p id="powerL1">--</p>
+          </div>
+          <div class="card">
+            <h3>Line 1 Current (A)</h3>
+            <p id="currentL1">--</p>
+          </div>
+          <div class="card">
+            <h3>Line 2 Power (W)</h3>
+            <p id="powerL2">--</p>
+          </div>
+          <div class="card">
+            <h3>Line 2 Current (A)</h3>
+            <p id="currentL2">--</p>
+          </div>
+        </div>
+      </div>
+
+    </main>
+    
+
+    <script>
+      // Función para actualizar dashboard
+      function updateDashboard(data) {
+        // PV
+        document.getElementById("MpptState").textContent = data.MpptState;
+        document.getElementById("PvVoltage").textContent = data.PvVoltage;
+        document.getElementById("ChargerPower").textContent = data.ChargerPower;
+
+        // Battery
+        document.getElementById("batteryVoltage").textContent =
+          data.batteryVoltage;
+        document.getElementById("batteryCurrent").textContent =
+          data.batteryCurrent;
+        document.getElementById("batteryPower").textContent = data.batteryPower;
+
+        // Calcula SOC basado en voltage
+        function calculateBatterySOC(voltage) {
+          const Vmin = 44.8; // voltaje descarga mínima
+          const Vmax = 53.5; // voltaje máxima
+          let soc = ((voltage - Vmin) / (Vmax - Vmin)) * 100;
+          soc = Math.max(0, Math.min(100, soc)); // limitar entre 0 y 100%
+          return Math.round(soc);
+        }
+
+        // Battery SOC Circle
+        const batteryVoltage = data.batteryVoltage || 0;
+        const soc = calculateBatterySOC(batteryVoltage);
+        const circle = document.getElementById("BMS_Battery_SOC_Circle");
+        circle.textContent = soc + "%";
+        circle.style.background = `conic-gradient(${soc > 20 ? "#00cc66" : "#ff3300"} 0% ${soc}%, #ddd ${soc}% 100%)`;
+
+        // Battery Direction
+        const dir = data.batteryDirection || "unknown";
+        const pDir = document.getElementById("batteryDirection");
+        pDir.textContent = dir;
+        pDir.className =
+          dir === "charging"
+            ? "state-charging"
+            : dir === "discharging"
+              ? "state-discharging"
+              : "";
+
+        // Load
+        document.getElementById("loadPower").textContent = data.loadPower;
+        document.getElementById("loadPercent").textContent = data.loadPercent;
+
+        document.getElementById("inverterVoltage").textContent =
+          data.inverterVoltage;
+        
+        document.getElementById("inverterFrequency").textContent =
+          data.inverterFrequency;
+
+        document.getElementById("powerL1").textContent = data.powerL1;
+        document.getElementById("currentL1").textContent = data.currentL1;
+
+        document.getElementById("powerL2").textContent = data.powerL2;
+        document.getElementById("currentL2").textContent = data.currentL2;
+      }
+
+      // Fetch periódico
+      async function fetchData() {
+        try {
+          const res = await fetch("http://192.168.1.199:8000/data");
+          const data = await res.json();
+          updateDashboard(data);
+        } catch (err) {
+          console.error("Error fetching data:", err);
+        }
+      }
+
+      setInterval(fetchData, 1000);
+      fetchData();
+    </script>
+  </body>
+</html>
