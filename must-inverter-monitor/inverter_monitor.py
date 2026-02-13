@@ -76,12 +76,6 @@ register_map = {
     15206: ["chBatteryVoltage", "Ch Battery Voltage", 0.1, "V"],
     15207: ["chChargerCurrent", "Ch Charger Current", 0.1, "A"],
     15208: ["ChargerPower", "Charger Power", 1, "W"],
-
-    # BMS
-    109: ["BMS_Battery_Voltage", "BMS Battery Voltage", 0.1, "V"],
-    110: ["BMS_Battery_Current", "BMS Battery Current", 0.1, "A"],
-    111: ["BMS_Battery_Temperature", "BMS Battery Temperature", 1, "C"],
-    113: ["BMS_Battery_SOC", "BMS Battery SOC", 1, "%"],
 }
 
 # ==============================
