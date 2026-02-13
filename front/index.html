@@ -202,9 +202,7 @@
           </div> -->
         </div>
       </div>
-
     </main>
-    
 
     <script>
       // Función para actualizar dashboard
@@ -254,7 +252,7 @@
 
         document.getElementById("inverterVoltage").textContent =
           data.inverterVoltage;
-        
+
         document.getElementById("inverterFrequency").textContent =
           data.inverterFrequency;
 
@@ -267,8 +265,11 @@
 
       // Fetch periódico
       async function fetchData() {
+        const PORT = 8001;
+        const ENDPOINT = "/data";
+        const HOST = location.hostname; // Esto obtiene la IP o hostname actual
         try {
-          const res = await fetch("http://192.168.1.199:8000/data");
+          const res = await fetch(`http://${HOST}:${PORT}${ENDPOINT}`);
           const data = await res.json();
           updateDashboard(data);
         } catch (err) {
