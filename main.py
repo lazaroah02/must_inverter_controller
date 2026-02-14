@@ -3,7 +3,7 @@ import socket
 import os
 import time
 import venv
-import sys
+
 
 # ---------------------------
 # Get Wi-Fi IP
@@ -18,6 +18,7 @@ def get_wifi_ip():
     finally:
         s.close()
     return ip
+
 
 # ---------------------------
 # Ensure virtual environment exists
@@ -43,6 +44,7 @@ def ensure_venv(root_dir):
 
     return venv_dir, python_exec
 
+
 # ---------------------------
 # Build environment for subprocess
 # ---------------------------
@@ -58,15 +60,15 @@ def build_venv_env(venv_dir):
         env["PATH"] = os.path.join(venv_dir, "bin") + os.pathsep + env["PATH"]
     return env
 
+
 def main():
     wifi_ip = get_wifi_ip()
     print(f"Detected IP: {wifi_ip}")
 
     # ---------------------------
-    # Define project directories
+    # Define project directory
     # ---------------------------
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-    FRONT_DIR = os.path.join(ROOT_DIR, "front")
     FASTAPI_DIR = os.path.join(ROOT_DIR, "must-inverter-monitor")
 
     # ---------------------------
@@ -85,16 +87,10 @@ def main():
         "--host", wifi_ip,
         "--port", "8001"
     ]
+    
     uvicorn_process = subprocess.Popen(uvicorn_cmd, cwd=FASTAPI_DIR, env=env)
 
-    # ---------------------------
-    # HTTP server command
-    # ---------------------------
-    http_cmd = [python_exec, "-m", "http.server", "8080", "--bind", wifi_ip]
-    http_process = subprocess.Popen(http_cmd, cwd=FRONT_DIR, env=env)
-
     print(f"FastAPI running at http://{wifi_ip}:8001")
-    print(f"HTML server running at http://{wifi_ip}:8080")
 
     # ---------------------------
     # Keep script alive until Ctrl+C
@@ -105,10 +101,8 @@ def main():
     except KeyboardInterrupt:
         print("\nStopping servers...")
         uvicorn_process.terminate()
-        http_process.terminate()
         uvicorn_process.wait()
-        http_process.wait()
-        print("Servers stopped")
+        print("Server stopped")
 
 
 if __name__ == "__main__":

@@ -9,3 +9,4 @@ urllib3==2.1.0
 fastapi
 uvicorn
 asyncio
+jinja2

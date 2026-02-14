@@ -1,8 +1,10 @@
 import asyncio
 import minimalmodbus
 import logging
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 import os
 from inverter_monitor import (
     read_register_values,
@@ -15,6 +17,7 @@ from inverter_monitor import (
 )
 
 app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -26,11 +29,14 @@ app.add_middleware(
 latest_data = {}
 
 os.makedirs("logs", exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s",
     handlers=[logging.StreamHandler()],
 )
+
+templates = Jinja2Templates(directory="front")
 
 
 async def modbus_loop():
@@ -78,3 +84,8 @@ async def startup_event():
 @app.get("/data")
 def get_data():
     return latest_data
+
+
+@app.get("/", response_class=HTMLResponse)
+async def read_dashboard(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})

@@ -154,7 +154,7 @@
             <p id="batteryPower">--</p>
           </div>
           <div class="card">
-            <h3>Battery SOC</h3>
+            <h3>Battery Level(Aprox)</h3>
             <div id="BMS_Battery_SOC_Circle" class="circle">--%</div>
           </div>
           <div class="card">
@@ -225,7 +225,7 @@
 
         // Calcula SOC basado en voltage
         function calculateBatterySOC(voltage) {
-          const Vmin = 44.8; // voltaje descarga mínima
+          const Vmin = 42.8; // voltaje descarga mínima
           const Vmax = 53; // voltaje máxima
           let soc = ((voltage - Vmin) / (Vmax - Vmin)) * 100;
           soc = Math.max(0, Math.min(100, soc)); // limitar entre 0 y 100%
@@ -272,11 +272,8 @@
 
       // Fetch periódico
       async function fetchData() {
-        const PORT = 8001;
-        const ENDPOINT = "/data";
-        const HOST = location.hostname; // Esto obtiene la IP o hostname actual
         try {
-          const res = await fetch(`http://${HOST}:${PORT}${ENDPOINT}`);
+          const res = await fetch("/data");
           const data = await res.json();
           updateDashboard(data);
         } catch (err) {
