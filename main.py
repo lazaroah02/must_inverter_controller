@@ -27,35 +27,31 @@ def ensure_venv(root_dir):
     venv_dir = os.path.join(root_dir, "venv")
     python_exec = os.path.join(venv_dir, "Scripts", "python.exe") if os.name == "nt" else os.path.join(venv_dir, "bin", "python")
 
-    # Create venv if it does not exist
     if not os.path.exists(venv_dir):
         print("Creating virtual environment...")
         venv.create(venv_dir, with_pip=True)
         print("Virtual environment created.")
 
-    # Always install/update dependencies
     req_file = os.path.join(root_dir, "requirements.txt")
     if os.path.exists(req_file):
-        print("Installing/updating dependencies from requirements.txt...")
+        print("Installing/updating dependencies...")
         subprocess.check_call([python_exec, "-m", "pip", "install", "--upgrade", "-r", req_file])
-        print("Dependencies installed/updated.")
+        print("Dependencies ready.")
     else:
-        print("No requirements.txt found, skipping dependencies installation.")
+        print("No requirements.txt found.")
 
     return venv_dir, python_exec
 
 
 # ---------------------------
-# Build environment for subprocess
+# Build environment
 # ---------------------------
 def build_venv_env(venv_dir):
     env = os.environ.copy()
     if os.name == "nt":
-        # Windows
         env["VIRTUAL_ENV"] = venv_dir
         env["PATH"] = os.path.join(venv_dir, "Scripts") + os.pathsep + env["PATH"]
     else:
-        # Linux/Mac
         env["VIRTUAL_ENV"] = venv_dir
         env["PATH"] = os.path.join(venv_dir, "bin") + os.pathsep + env["PATH"]
     return env
@@ -63,37 +59,41 @@ def build_venv_env(venv_dir):
 
 def main():
     wifi_ip = get_wifi_ip()
+    port = "8001"
     print(f"Detected IP: {wifi_ip}")
 
-    # ---------------------------
-    # Define project directory
-    # ---------------------------
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
     FASTAPI_DIR = os.path.join(ROOT_DIR, "must-inverter-monitor")
 
-    # ---------------------------
-    # Setup virtual environment
-    # ---------------------------
     venv_dir, python_exec = ensure_venv(ROOT_DIR)
     env = build_venv_env(venv_dir)
 
     # ---------------------------
-    # FastAPI command
+    # Start FastAPI
     # ---------------------------
     uvicorn_cmd = [
         python_exec, "-m", "uvicorn",
         "app:app",
         "--reload",
         "--host", wifi_ip,
-        "--port", "8001"
+        "--port", port
     ]
-    
-    uvicorn_process = subprocess.Popen(uvicorn_cmd, cwd=FASTAPI_DIR, env=env)
 
-    print(f"FastAPI running at http://{wifi_ip}:8001")
+    uvicorn_process = subprocess.Popen(uvicorn_cmd, cwd=FASTAPI_DIR, env=env)
+    print(f"FastAPI running at http://{wifi_ip}:{port}")
 
     # ---------------------------
-    # Keep script alive until Ctrl+C
+    # Start ngrok tunnel
+    # ---------------------------
+    ngrok_cmd = [
+        "ngrok", "http", f"{wifi_ip}:{port}"
+    ]
+
+    ngrok_process = subprocess.Popen(ngrok_cmd)
+    print("ngrok tunnel started")
+
+    # ---------------------------
+    # Keep alive
     # ---------------------------
     try:
         while True:
@@ -101,8 +101,12 @@ def main():
     except KeyboardInterrupt:
         print("\nStopping servers...")
         uvicorn_process.terminate()
+        ngrok_process.terminate()
+
         uvicorn_process.wait()
-        print("Server stopped")
+        ngrok_process.wait()
+
+        print("All processes stopped")
 
 
 if __name__ == "__main__":
