@@ -206,6 +206,29 @@
           </div> -->
         </div>
       </div>
+
+      <!-- Grid Group -->
+      <div class="group" id="gridGroup">
+        <h2>Grid</h2>
+        <div class="cards">
+          <div class="card">
+            <h3>Grid Voltage (V)</h3>
+            <p id="gridVoltage">--</p>
+          </div>
+          <div class="card">
+            <h3>Grid Current (A)</h3>
+            <p id="gridCurrent">--</p>
+          </div>
+          <div class="card">
+            <h3>Grid Power (W)</h3>
+            <p id="gridPower">--</p>
+          </div>
+          <div class="card">
+            <h3>Grid Frequency (Hz)</h3>
+            <p id="gridFrequency">--</p>
+          </div>
+        </div>
+      </div>
     </main>
 
     <script>
@@ -215,6 +238,18 @@
         document.getElementById("MpptState").textContent = data.MpptState;
         document.getElementById("PvVoltage").textContent = data.PvVoltage;
         document.getElementById("ChargerPower").textContent = data.ChargerPower;
+
+        // Grid
+        document.getElementById("gridVoltage").textContent =
+          data.gridVoltage ?? 0;
+
+        document.getElementById("gridCurrent").textContent =
+          data.gridCurrent ?? 0;
+
+        document.getElementById("gridPower").textContent = data.gridPower ?? 0;
+
+        document.getElementById("gridFrequency").textContent =
+          data.gridFrequency ?? 0;
 
         // Battery
         document.getElementById("batteryVoltage").textContent =
