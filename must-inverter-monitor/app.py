@@ -41,13 +41,47 @@ templates = Jinja2Templates(directory="front")
 
 async def modbus_loop():
     global latest_data
-    while True:
-        try:
-            instrument = minimalmodbus.Instrument(SERPORT, 4)
-            instrument.serial.timeout = SERTIMEOUT
-            instrument.serial.baudrate = SERBAUD
 
+    instrument = None
+    was_connected = False
+
+    while True:
+
+        # =========================
+        # CONNECT IF NEEDED
+        # =========================
+        if instrument is None:
+            try:
+                if not was_connected:
+                    logging.info("Trying to connect to inverter...")
+
+                instrument = minimalmodbus.Instrument(SERPORT, 4)
+                instrument.serial.timeout = SERTIMEOUT
+                instrument.serial.baudrate = SERBAUD
+
+                # 🔥 IMPORTANT FOR WINDOWS
+                instrument.close_port_after_each_call = True
+
+                logging.info("Connected to inverter.")
+                was_connected = True
+
+            except Exception as e:
+                if was_connected:
+                    logging.warning("Connection lost. Retrying...")
+                else:
+                    logging.warning(f"Connection failed: {e}")
+
+                instrument = None
+                was_connected = False
+                await asyncio.sleep(5)
+                continue
+
+        # =========================
+        # READ DATA
+        # =========================
+        try:
             all_data = {}
+
             all_data.update(read_register_values(instrument, 15201, 10))
             all_data.update(read_register_values(instrument, 25201, 20))
             all_data.update(read_register_values(instrument, 25221, 20))
@@ -57,9 +91,9 @@ async def modbus_loop():
             all_data.update(read_register_values(instrument, 20109, 5))
             all_data.update(read_register_values(instrument, 109, 5))
 
-            # Currents
             l1_current = read_int32(instrument, 10120, 10)
             l2_current = read_int32(instrument, 10122, 10)
+
             if l1_current is not None:
                 all_data["currentL1"] = l1_current
             if l2_current is not None:
@@ -71,7 +105,21 @@ async def modbus_loop():
             latest_data = all_data
 
         except Exception as e:
-            logging.error(f"General error: {e}")
+            logging.error(f"Read error: {e}")
+            logging.warning("Device disconnected. Releasing COM port...")
+
+            try:
+                if instrument and instrument.serial:
+                    instrument.serial.close()
+            except Exception as close_error:
+                logging.warning(f"Error closing port: {close_error}")
+
+            instrument = None
+            was_connected = False
+
+            # ⏳ Give Windows time to fully release COM
+            await asyncio.sleep(3)
+            continue
 
         await asyncio.sleep(INTERVAL)
 

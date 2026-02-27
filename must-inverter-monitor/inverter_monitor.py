@@ -78,6 +78,7 @@ register_map = {
     15208: ["ChargerPower", "Charger Power", 1, "W"],
 }
 
+
 # ==============================
 # READ STANDARD REGISTERS
 # ==============================
