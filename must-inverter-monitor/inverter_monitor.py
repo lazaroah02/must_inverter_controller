@@ -58,6 +58,8 @@ register_map = {
     25225: ["inverterFrequency", "Inverter frequency", 0.01, "Hz"],
     25226: ["gridFrequency", "Grid frequency", 0.01, "Hz"],
     25233: ["acRadiatorTemperature", "AC radiator temperature", 1, "C"],
+    # note: some firmware versions use offset addresses.  Primary below matches
+    # documentation, but fallback 25246 and 25254 are read programmatically.
     25247: ["inverterVoltageL1", "Inverter voltage L1", 0.1, "V"],
     25248: ["inverterVoltageL2", "Inverter voltage L2", 0.1, "V"],
     25250: ["inverterCurrentL1", "Inverter current L1", 0.1, "A"],
@@ -182,10 +184,47 @@ def calculate_derived_metrics(data):
     inverter_current_l1 = data.get("inverterCurrentL1")
     inverter_current_l2 = data.get("inverterCurrentL2")
     
+    # if line voltages are wildly off from half of inverterVoltage, override
+    inv_volt = data.get("inverterVoltage")
+    if inv_volt is not None:
+        half = round(inv_volt / 2, 2)
+        # check if either value is missing or differs significantly (>20V)
+        if inverter_voltage_l1 is None or abs(inverter_voltage_l1 - half) > 20:
+            inverter_voltage_l1 = half
+        if inverter_voltage_l2 is None or abs(inverter_voltage_l2 - half) > 20:
+            inverter_voltage_l2 = half
+    # fallback currents: if unavailable or zero, split total power evenly
+    total_power = data.get("inverterPower")
+    # recalc currents if missing or clearly wrong (>50A)
+    if total_power and (inverter_current_l1 is None or inverter_current_l1 <= 0 or inverter_current_l1 > 50):
+        if inverter_voltage_l1:
+            inverter_current_l1 = round((total_power / 2) / inverter_voltage_l1, 2)
+    if total_power and (inverter_current_l2 is None or inverter_current_l2 <= 0 or inverter_current_l2 > 50):
+        if inverter_voltage_l2:
+            inverter_current_l2 = round((total_power / 2) / inverter_voltage_l2, 2)
+    # if estimated line powers don't sum to something near total, split evenly
+    if total_power and inverter_voltage_l1 and inverter_voltage_l2:
+        est1 = (inverter_voltage_l1 * inverter_current_l1) if inverter_current_l1 else 0
+        est2 = (inverter_voltage_l2 * inverter_current_l2) if inverter_current_l2 else 0
+        if abs((est1 + est2) - total_power) > abs(total_power) * 0.5:
+            # recalc both currents equally
+            inverter_current_l1 = round((total_power / 2) / inverter_voltage_l1, 2)
+            inverter_current_l2 = round((total_power / 2) / inverter_voltage_l2, 2)
+
     load_voltage_l1 = data.get("loadVoltageL1")
     load_voltage_l2 = data.get("loadVoltageL2")
     load_current_l1 = data.get("loadCurrentL1")
     load_current_l2 = data.get("loadCurrentL2")
+
+    # propagate any corrected line voltages/currents back into data
+    if inverter_voltage_l1 is not None:
+        derived["inverterVoltageL1"] = inverter_voltage_l1
+    if inverter_voltage_l2 is not None:
+        derived["inverterVoltageL2"] = inverter_voltage_l2
+    if inverter_current_l1 is not None:
+        derived["inverterCurrentL1"] = inverter_current_l1
+    if inverter_current_l2 is not None:
+        derived["inverterCurrentL2"] = inverter_current_l2
 
     # Battery calculated power
     if battery_voltage is not None and battery_current is not None:
@@ -341,6 +380,49 @@ def main():
 
             if l2_current is not None:
                 all_data["currentL2"] = l2_current
+
+            # attempt to discover correct line registers by scanning block
+            def auto_detect_lines():
+                try:
+                    regs = instrument.read_registers(25201, 100)
+                except Exception:
+                    return
+                # try both 0.1 and 0.01 scalings
+                scaled10 = [r * 0.1 for r in regs]
+                scaled01 = [r * 0.01 for r in regs]
+                power = all_data.get("inverterPower") or all_data.get("loadPower") or 0
+                best = None
+                best_err = float("inf")
+                n = len(regs)
+                for i in range(n):
+                    v1 = scaled10[i]
+                    if not (50 < v1 < 130):
+                        continue
+                    for j in range(i + 1, n):
+                        v2 = scaled10[j]
+                        if not (50 < v2 < 130):
+                            continue
+                        for a in range(n):
+                            i1 = scaled01[a]
+                            if not (0 <= i1 < 30):
+                                continue
+                            for b in range(a + 1, n):
+                                i2 = scaled01[b]
+                                if not (0 <= i2 < 30):
+                                    continue
+                                est = v1 * i1 + v2 * i2
+                                err = abs(est - power)
+                                if err < best_err:
+                                    best_err = err
+                                    best = (i, j, a, b, v1, v2, i1, i2)
+                if best:
+                    i, j, a, b, v1, v2, i1, i2 = best
+                    base = 25201
+                    all_data["inverterVoltageL1"] = v1
+                    all_data["inverterVoltageL2"] = v2
+                    all_data["inverterCurrentL1"] = i1
+                    all_data["inverterCurrentL2"] = i2
+            auto_detect_lines()
 
             derived_data = calculate_derived_metrics(all_data)
             all_data.update(derived_data)
