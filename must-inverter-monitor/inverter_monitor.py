@@ -58,6 +58,14 @@ register_map = {
     25225: ["inverterFrequency", "Inverter frequency", 0.01, "Hz"],
     25226: ["gridFrequency", "Grid frequency", 0.01, "Hz"],
     25233: ["acRadiatorTemperature", "AC radiator temperature", 1, "C"],
+    25247: ["inverterVoltageL1", "Inverter voltage L1", 0.1, "V"],
+    25248: ["inverterVoltageL2", "Inverter voltage L2", 0.1, "V"],
+    25250: ["inverterCurrentL1", "Inverter current L1", 0.1, "A"],
+    25251: ["inverterCurrentL2", "Inverter current L2", 0.1, "A"],
+    25257: ["loadVoltageL1", "Load voltage L1", 0.1, "V"],
+    25258: ["loadVoltageL2", "Load voltage L2", 0.1, "V"],
+    25260: ["loadCurrentL1", "Load current L1", 0.1, "A"],
+    25261: ["loadCurrentL2", "Load current L2", 0.1, "A"],
     25273: ["batteryPower", "Battery power", 1, "W"],
     25274: ["batteryCurrent", "Battery current", 1, "A"],
 
@@ -163,9 +171,21 @@ def calculate_derived_metrics(data):
     charger_power = data.get("ChargerPower", 0)
     soc = data.get("BMS_Battery_SOC")
 
+    # Old method for line currents (INT32)
     l1_current = data.get("currentL1")
     l2_current = data.get("currentL2")
     inverter_voltage = data.get("inverterVoltage")
+
+    # NEW: Get individual line data from registers
+    inverter_voltage_l1 = data.get("inverterVoltageL1")
+    inverter_voltage_l2 = data.get("inverterVoltageL2")
+    inverter_current_l1 = data.get("inverterCurrentL1")
+    inverter_current_l2 = data.get("inverterCurrentL2")
+    
+    load_voltage_l1 = data.get("loadVoltageL1")
+    load_voltage_l2 = data.get("loadVoltageL2")
+    load_current_l1 = data.get("loadCurrentL1")
+    load_current_l2 = data.get("loadCurrentL2")
 
     # Battery calculated power
     if battery_voltage is not None and battery_current is not None:
@@ -190,12 +210,15 @@ def calculate_derived_metrics(data):
     if load_power > 0:
         derived["gridDependencyPercent"] = round((grid_power / load_power) * 100, 2)
 
-    # Consumption source
-    if grid_power > 50:
+    # Consumption source - gridPower is negative when grid is feeding the system
+    if data.get("gridVoltage") > 0:
+        # grid is supplying energy into inverter/battery/load
         derived["houseConsumptionSource"] = "grid"
-    elif battery_power and abs(battery_power) > 50:
+    elif battery_power is not None and battery_power < -50:
+        # battery is discharging (power leaving battery to house)
         derived["houseConsumptionSource"] = "battery"
     elif charger_power > 50:
+        # solar charger producing significant power
         derived["houseConsumptionSource"] = "solar"
     else:
         derived["houseConsumptionSource"] = "mixed/low"
@@ -214,7 +237,61 @@ def calculate_derived_metrics(data):
             (load_power / input_power) * 100, 2
         )
 
-    # Phase power calculations
+    # ==========================================
+    # NEW: Individual Line Power Calculations
+    # ==========================================
+    
+    # Line 1 Inverter Power (Register-based)
+    if inverter_voltage_l1 is not None and inverter_current_l1 is not None:
+        derived["inverterPowerL1"] = round(inverter_voltage_l1 * inverter_current_l1, 2)
+
+    # Line 2 Inverter Power (Register-based)
+    if inverter_voltage_l2 is not None and inverter_current_l2 is not None:
+        derived["inverterPowerL2"] = round(inverter_voltage_l2 * inverter_current_l2, 2)
+
+    # Load Line 1 Power (Register-based)
+    if load_voltage_l1 is not None and load_current_l1 is not None:
+        derived["loadPowerL1"] = round(load_voltage_l1 * load_current_l1, 2)
+
+    # Load Line 2 Power (Register-based)
+    if load_voltage_l2 is not None and load_current_l2 is not None:
+        derived["loadPowerL2"] = round(load_voltage_l2 * load_current_l2, 2)
+
+    # Total Line Power (sum of both lines)
+    if "inverterPowerL1" in derived and "inverterPowerL2" in derived:
+        derived["inverterPowerTotal"] = round(
+            derived["inverterPowerL1"] + derived["inverterPowerL2"], 2
+        )
+
+    if "loadPowerL1" in derived and "loadPowerL2" in derived:
+        derived["loadPowerTotal"] = round(
+            derived["loadPowerL1"] + derived["loadPowerL2"], 2
+        )
+
+    # Phase Imbalance (Inverter)
+    if "inverterPowerL1" in derived and "inverterPowerL2" in derived:
+        max_inv_power = max(
+            abs(derived["inverterPowerL1"]), abs(derived["inverterPowerL2"])
+        )
+        if max_inv_power > 0:
+            derived["inverterPhaseImbalancePercent"] = round(
+                abs(
+                    derived["inverterPowerL1"] - derived["inverterPowerL2"]
+                ) / max_inv_power * 100,
+                2,
+            )
+
+    # Phase Imbalance (Load)
+    if "loadPowerL1" in derived and "loadPowerL2" in derived:
+        max_load_power = max(abs(derived["loadPowerL1"]), abs(derived["loadPowerL2"]))
+        if max_load_power > 0:
+            derived["loadPhaseImbalancePercent"] = round(
+                abs(derived["loadPowerL1"] - derived["loadPowerL2"])
+                / max_load_power * 100,
+                2,
+            )
+
+    # Legacy phase power calculations (from INT32 registers if available)
     if inverter_voltage and l1_current is not None:
         derived["powerL1"] = round(inverter_voltage * l1_current, 2)
 

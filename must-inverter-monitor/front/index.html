@@ -7,305 +7,967 @@
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
 
+      * {
+        box-sizing: border-box;
+      }
+
       body {
         font-family: "Roboto", sans-serif;
         margin: 0;
-        background: #f4f6f8;
-        color: #333;
+        background: #0f172a;
+        color: #e2e8f0;
       }
 
       header {
-        background: #0077cc;
+        background: linear-gradient(135deg, #1e3a8a 0%, #0c4a6e 100%);
         color: white;
-        padding: 1rem;
+        padding: 1.5rem;
         text-align: center;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 1.8rem;
       }
 
       main {
-        padding: 1rem;
+        padding: 1.5rem;
         display: grid;
         grid-template-columns: 1fr;
-        gap: 1rem;
-        max-width: 1200px;
+        gap: 1.5rem;
+        max-width: 1400px;
         margin: auto;
       }
 
-      .group {
-        background: white;
+      .status-bar {
+        background: linear-gradient(135deg, #1e40af 0%, #0c4a6e 100%);
         border-radius: 10px;
-        padding: 1rem;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        flex-wrap: wrap;
+        gap: 1rem;
+        width: 100%;
+      }
+
+      .status-item {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+      }
+
+      .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.9rem;
+      }
+
+      .status-badge.bypass {
+        background: #f97316;
+        color: #1f2937;
+      }
+
+      .status-badge.grid-tie {
+        background: #06b6d4;
+        color: #1f2937;
+      }
+
+      .status-badge.offgrid {
+        background: #ef4444;
+        color: white;
+      }
+
+      .status-badge.charging {
+        background: #22c55e;
+        color: #1f2937;
+      }
+
+      .status-badge.discharging {
+        background: #f43f5e;
+        color: white;
+      }
+
+      .group {
+        background: #1a294a;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        border: 1px solid #2d4a7b;
       }
 
       .group h2 {
         margin-top: 0;
-        font-size: 1.2rem;
-        color: #0077cc;
-        border-bottom: 2px solid #0077cc;
-        padding-bottom: 0.5rem;
+        font-size: 1.3rem;
+        color: #60a5fa;
+        border-bottom: 2px solid #0284c7;
+        padding-bottom: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
       }
 
       .cards {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
         gap: 1rem;
         margin-top: 1rem;
       }
 
       .card {
-        background: #fdfdfd;
-        padding: 1rem;
+        background: #0f172a;
+        padding: 1.2rem;
         border-radius: 8px;
         text-align: center;
-        position: relative;
-        transition: transform 0.2s;
+        border: 1px solid #2d4a7b;
+        transition: all 0.3s;
       }
 
       .card:hover {
         transform: translateY(-4px);
+        border-color: #60a5fa;
+        background: #1a294a;
       }
 
       .card h3 {
         margin: 0;
-        font-size: 0.9rem;
-        color: #555;
+        font-size: 0.8rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
 
       .card p {
-        font-size: 1.2rem;
+        font-size: 1.5rem;
         font-weight: bold;
-        margin: 0.5rem 0 0 0;
+        margin: 0.8rem 0 0 0;
+        color: #60a5fa;
       }
 
-      /* Battery circle */
-      .circle {
-        width: 80px;
-        height: 80px;
+      .card.warning {
+        border-color: #f97316;
+        background: #7f2e17;
+      }
+
+      .card.warning p {
+        color: #fdba74;
+      }
+
+      .card.error {
+        border-color: #ef4444;
+        background: #7f1d1d;
+      }
+
+      .card.error p {
+        color: #fca5a5;
+      }
+
+      .card.success {
+        border-color: #22c55e;
+        background: #166534;
+      }
+
+      .card.success p {
+        color: #86efac;
+      }
+
+      /* Power Flow Diagram */
+      .power-flow {
+        background: #0f172a;
+        border: 1px solid #2d4a7b;
+        border-radius: 8px;
+        padding: 2rem;
+        margin-top: 1rem;
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        gap: 2rem;
+        align-items: center;
+        text-align: center;
+      }
+
+      .power-source {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.8rem;
+      }
+
+      .power-source-icon {
+        width: 60px;
+        height: 60px;
         border-radius: 50%;
-        background: conic-gradient(#00cc66 0% 0%, #ddd 0% 100%);
-        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+      }
+
+      .flow-center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .flow-arrow {
+        font-size: 1.5rem;
+        color: #60a5fa;
+        animation: pulse 1.5s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      /* Line Status Cards */
+      .line-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .line-card {
+        background: #0f172a;
+        border: 1px solid #2d4a7b;
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: center;
+      }
+
+      .line-card h4 {
+        margin: 0 0 1rem 0;
+        color: #60a5fa;
+        font-size: 1rem;
+      }
+
+      .line-metric {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0.8rem 0;
+        padding: 0.8rem;
+        background: rgba(96, 165, 250, 0.1);
+        border-radius: 4px;
+        font-size: 0.9rem;
+      }
+
+      .line-metric span:first-child {
+        color: #94a3b8;
+      }
+
+      .line-metric span:last-child {
+        font-weight: bold;
+        color: #60a5fa;
+      }
+
+      .line-metric.warning {
+        background: rgba(249, 115, 22, 0.1);
+        border-left: 3px solid #f97316;
+      }
+
+      .line-metric.warning span:last-child {
+        color: #fdba74;
+      }
+
+      .battery-circle {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin: 1rem auto;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: bold;
-        color: #333;
-        font-size: 1rem;
-        transition: background 0.5s;
+        color: white;
+        font-size: 1.5rem;
+        transition: all 0.5s;
       }
 
-      /* Colors by state */
-      .state-offgrid {
-        color: #ff9900;
+      .warning-box {
+        background: #7f2e17;
+        border: 1px solid #f97316;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+        color: #fdba74;
+        font-size: 0.9rem;
       }
-      .state-charging {
-        color: #00cc66;
+
+      .success-box {
+        background: #166534;
+        border: 1px solid #22c55e;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+        color: #86efac;
+        font-size: 0.9rem;
       }
-      .state-discharging {
-        color: #ff3300;
+
+      /* Responsive */
+      @media (max-width: 900px) {
+        .power-flow {
+          grid-template-columns: 1fr;
+        }
+
+        .cards {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .card p, .line-metric span:last-child {
+          font-size: 1.2rem;
+        }
       }
 
       @media (max-width: 600px) {
         .cards {
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: 1fr;
         }
+
+        .status-bar {
+          flex-direction: column;
+          text-align: center;
+        }
+
+        header h1 {
+          font-size: 1.4rem;
+        }
+
+        .card h3 {
+          font-size: 0.75rem;
+        }
+
+        .card p {
+          font-size: 1rem;
+        }
+
+        .line-metric {
+          font-size: 0.8rem;
+        }
+
+        .info-icon {
+          font-size: 0.9rem;
+        }
+      }
+
+      @media (max-width: 500px) {
+        main {
+          padding: 0.75rem;
+          gap: 0.75rem;
+        }
+
+        header {
+          padding: 0.75rem;
+        }
+
+        header h1 {
+          font-size: 1.2rem;
+          margin: 0;
+        }
+
+        .group {
+          padding: 0.75rem;
+          border-radius: 6px;
+        }
+
+        .group h2 {
+          font-size: 1rem;
+          margin: 0 0 0.5rem 0;
+          padding-bottom: 0.4rem;
+        }
+
+        .cards {
+          gap: 0.5rem;
+          grid-template-columns: 1fr;
+        }
+
+        .card {
+          padding: 0.75rem;
+          border-radius: 6px;
+        }
+
+        .card h3 {
+          font-size: 0.65rem;
+          margin: 0 0 0.3rem 0;
+        }
+
+        .card p {
+          font-size: 0.9rem;
+          margin: 0;
+        }
+
+        .status-bar {
+          padding: 0.75rem;
+          gap: 0.5rem;
+          flex-direction: column;
+          text-align: center;
+        }
+
+        .status-item {
+          gap: 0.4rem;
+          font-size: 0.85rem;
+        }
+
+        .status-badge {
+          padding: 0.3rem 0.6rem;
+          font-size: 0.75rem;
+          border-radius: 15px;
+        }
+
+        .power-flow {
+          padding: 1rem;
+          gap: 1rem;
+          grid-template-columns: 1fr;
+        }
+
+        .power-source {
+          gap: 0.4rem;
+        }
+
+        .power-source-icon {
+          width: 50px;
+          height: 50px;
+          font-size: 1.8rem;
+        }
+
+        .flow-arrow {
+          font-size: 1.2rem;
+        }
+
+        .line-cards {
+          gap: 0.5rem;
+        }
+
+        .line-card {
+          padding: 1rem;
+          border-radius: 6px;
+        }
+
+        .line-card h4 {
+          font-size: 0.85rem;
+          margin: 0 0 0.5rem 0;
+        }
+
+        .line-metric {
+          font-size: 0.7rem;
+          margin: 0.5rem 0;
+          padding: 0.5rem;
+        }
+
+        .info-icon {
+          font-size: 0.8rem;
+          margin-left: 0.2rem;
+        }
+
+        .modal {
+          width: 95%;
+          padding: 1rem;
+        }
+
+        .modal h3 {
+          font-size: 1rem;
+        }
+
+        .modal p {
+          font-size: 0.85rem;
+        }
+
+        .warning-box, .success-box {
+          padding: 0.75rem;
+          font-size: 0.8rem;
+          margin-top: 0.75rem;
+        }
+      }
+
+      .icon {
+        display: inline-block;
+        margin-right: 0.5rem;
+      }
+
+      /* info icon */
+      .info-icon {
+        cursor: pointer;
+        font-size: 1rem;
+        color: #94a3b8;
+        margin-left: 0.3rem;
+      }
+      .info-icon:hover {
+        color: #60a5fa;
+      }
+      /* modal */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.6);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+      .modal {
+        background: #1a294a;
+        color: #e2e8f0;
+        padding: 1.5rem;
+        border-radius: 8px;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+        position: relative;
+      }
+      .modal h3 {
+        margin-top: 0;
+        font-size: 1.2rem;
+        color: #60a5fa;
+      }
+      .modal p {
+        font-size: 0.95rem;
+        line-height: 1.4;
+      }
+      .modal .close-btn {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        cursor: pointer;
+        font-size: 1.2rem;
+        color: #e2e8f0;
       }
     </style>
   </head>
   <body>
     <header>
-      <h1>Must Inverter Dashboard</h1>
+      <h1>⚡ Must Inverter Dashboard</h1>
     </header>
 
     <main>
-      <!-- PV Group -->
-      <div class="group" id="pvGroup">
-        <h2>Solar PV</h2>
+      <!-- modal -->
+      <div class="modal-overlay" id="infoModal">
+        <div class="modal">
+          <span class="close-btn" onclick="hideModal()">×</span>
+          <h3 id="modalTitle"></h3>
+          <p id="modalText"></p>
+        </div>
+      </div>
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <div class="status-item">
+          <strong>Mode:</strong>
+          <span class="status-badge" id="modesStatus">--</span>
+        </div>
+        <div class="status-item">
+          <strong>Battery:</strong>
+          <span class="status-badge" id="batteryDirStatus">--</span>
+        </div>
+        <div class="status-item">
+          <strong>Power Source:</strong>
+          <span id="powerSourceStatus">--</span>
+        </div>
+        <div class="status-item">
+          <strong>Frequency:</strong>
+          <span id="frequencyStatus">--</span> Hz
+        </div>
+      </div>
+
+      <!-- Power Flow Section -->
+      <div class="group">
+        <h2>⚡ Power Flow <span class="info-icon" onclick="showInfo('powerFlow')">❔</span></h2>
+        <div class="power-flow">
+          <div class="power-source">
+            <div class="power-source-icon" id="pvIcon">☀️</div>
+            <strong>Solar</strong>
+            <span id="pvPower" style="color: #22c55e">0W</span>
+          </div>
+          <div class="flow-center">
+            <div id="flowGrid" style="color: #60a5fa">Grid ✓</div>
+            <div class="flow-arrow">⟵ ⟶</div>
+            <div id="flowBattery" style="color: #22c55e">CHARGING 🔋</div>
+            <div class="flow-arrow"></div>
+            <div id="flowLoad" style="color: #94a3b8">Load: 0W</div>
+          </div>
+          <div class="power-source">
+            <div class="power-source-icon" id="batteryIcon">🔋</div>
+            <strong>Battery</strong>
+            <span id="batteryStatus" style="color: #60a5fa">53.3V</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Health -->
+      <div class="group">
+        <h2>🏥 System Health <span class="info-icon" onclick="showInfo('systemHealth')">❔</span></h2>
         <div class="cards">
           <div class="card">
-            <h3>MPPT State</h3>
+            <h3>Temperature</h3>
+            <p id="tempStatus">--°C</p>
+          </div>
+          <div class="card">
+            <h3>Inverter Voltage <span class="info-icon" onclick="showInfo('inverterVoltage')">❔</span></h3>
+            <p id="inverterVoltage">--V</p>
+          </div>
+          <div class="card">
+            <h3>Grid Voltage</h3>
+            <p id="gridVoltage">--V</p>
+          </div>
+          <div class="card">
+            <h3>Battery Voltage <span class="info-icon" onclick="showInfo('batteryVoltage')">❔</span></h3>
+            <p id="batteryVoltage">--V</p>
+          </div>
+          <div class="card">
+            <h3>Battery Current <span class="info-icon" onclick="showInfo('batteryCurrent')">❔</span></h3>
+            <p id="batteryCurrent">--A</p>
+          </div>
+          <div class="card">
+            <h3>Battery Power <span class="info-icon" onclick="showInfo('batteryPower')">❔</span></h3>
+            <p id="batteryPower">--W</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Output Lines -->
+      <div class="group">
+        <h2>📊 Output Lines (L1 & L2) <span class="info-icon" onclick="showInfo('lines')">❔</span></h2>
+        <div class="line-cards">
+          <div class="line-card">
+            <h4>Line 1</h4>
+            <div class="line-metric">
+              <span>Voltage:</span>
+              <span id="l1Voltage">0.0V</span>
+            </div>
+            <div class="line-metric">
+              <span>Current:</span>
+              <span id="l1Current">0.0A</span>
+            </div>
+            <div class="line-metric">
+              <span>Power:</span>
+              <span id="l1Power">0W</span>
+            </div>
+            <div class="line-metric">
+              <span>Load Voltage:</span>
+              <span id="l1LoadVoltage">0.0V</span>
+            </div>
+            <div class="line-metric">
+              <span>Load Current:</span>
+              <span id="l1LoadCurrent">0.0A</span>
+            </div>
+            <div class="line-metric">
+              <span>Load Power:</span>
+              <span id="l1LoadPower">0W</span>
+            </div>
+          </div>
+          <div class="line-card">
+            <h4>Line 2</h4>
+            <div class="line-metric">
+              <span>Voltage:</span>
+              <span id="l2Voltage">0.0V</span>
+            </div>
+            <div class="line-metric">
+              <span>Current:</span>
+              <span id="l2Current">0.0A</span>
+            </div>
+            <div class="line-metric">
+              <span>Power:</span>
+              <span id="l2Power">0W</span>
+            </div>
+            <div class="line-metric">
+              <span>Load Voltage:</span>
+              <span id="l2LoadVoltage">0.0V</span>
+            </div>
+            <div class="line-metric">
+              <span>Load Current:</span>
+              <span id="l2LoadCurrent">0.0A</span>
+            </div>
+            <div class="line-metric">
+              <span>Load Power:</span>
+              <span id="l2LoadPower">0W</span>
+            </div>
+          </div>
+        </div>
+        <div id="lineImbalanceWarning"></div>
+      </div>
+
+      <!-- Grid Section -->
+      <div class="group">
+        <h2>🌐 Grid Status <span class="info-icon" onclick="showInfo('grid')">❔</span></h2>
+        <div class="cards">
+          <div class="card">
+            <h3>Grid Voltage <span class="info-icon" onclick="showInfo('gridVoltage')">❔</span></h3>
+            <p id="gridVoltageCard">--V</p>
+          </div>
+          <div class="card">
+            <h3>Grid Current <span class="info-icon" onclick="showInfo('gridCurrent')">❔</span></h3>
+            <p id="gridCurrent">--A</p>
+          </div>
+          <div class="card">
+            <h3>Grid Power <span class="info-icon" onclick="showInfo('gridPower')">❔</span></h3>
+            <p id="gridPowerCard">--W</p>
+          </div>
+          <div class="card">
+            <h3>Grid Frequency <span class="info-icon" onclick="showInfo('gridFrequency')">❔</span></h3>
+            <p id="gridFrequency">--Hz</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Solar Section -->
+      <div class="group">
+        <h2>☀️ Solar Charger <span class="info-icon" onclick="showInfo('solar')">❔</span></h2>
+        <div class="cards">
+          <div class="card">
+            <h3>MPPT State <span class="info-icon" onclick="showInfo('MpptState')">❔</span></h3>
             <p id="MpptState">--</p>
           </div>
           <div class="card">
-            <h3>PV Voltage (V)</h3>
-            <p id="PvVoltage">--</p>
+            <h3>PV Voltage <span class="info-icon" onclick="showInfo('PvVoltage')">❔</span></h3>
+            <p id="PvVoltage">--V</p>
           </div>
           <div class="card">
-            <h3>Solar Power (W)</h3>
-            <p id="ChargerPower">--</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Battery Group -->
-      <div class="group" id="batteryGroup">
-        <h2>Battery</h2>
-        <div class="cards">
-          <div class="card">
-            <h3>Battery Voltage (V)</h3>
-            <p id="batteryVoltage">--</p>
+            <h3>Charger Current <span class="info-icon" onclick="showInfo('chChargerCurrent')">❔</span></h3>
+            <p id="chChargerCurrent">--A</p>
           </div>
           <div class="card">
-            <h3>Battery Current (A)</h3>
-            <p id="batteryCurrent">--</p>
-          </div>
-          <div class="card">
-            <h3>Battery Power (W)</h3>
-            <p id="batteryPower">--</p>
-          </div>
-          <div class="card">
-            <h3>Battery Level(Aprox)</h3>
-            <div id="BMS_Battery_SOC_Circle" class="circle">--%</div>
-          </div>
-          <div class="card">
-            <h3>Battery Direction</h3>
-            <p id="batteryDirection">--</p>
+            <h3>Solar Power <span class="info-icon" onclick="showInfo('ChargerPower')">❔</span></h3>
+            <p id="ChargerPower">--W</p>
           </div>
         </div>
       </div>
 
-      <!-- Load Group -->
-      <div class="group" id="loadGroup">
-        <h2>Inverter</h2>
+      <!-- Load Summary -->
+      <div class="group">
+        <h2>🏠 Load Summary <span class="info-icon" onclick="showInfo('loadSummary')">❔</span></h2>
         <div class="cards">
           <div class="card">
-            <h3>Total Load Power (W)</h3>
-            <p id="loadPower">--</p>
+            <h3>Total Load Power <span class="info-icon" onclick="showInfo('loadPower')">❔</span></h3>
+            <p id="loadPower">--W</p>
           </div>
           <div class="card">
-            <h3>Total Load %</h3>
-            <p id="loadPercent">--</p>
+            <h3>Load Percent <span class="info-icon" onclick="showInfo('loadPercent')">❔</span></h3>
+            <p id="loadPercent">--%</p>
           </div>
           <div class="card">
-            <h3>Inverter Voltage (V)</h3>
-            <p id="inverterVoltage">--</p>
+            <h3>Total Load Voltage</h3>
+            <p id="loadTotalVoltage">--V</p>
           </div>
           <div class="card">
-            <h3>Inverter Freq (Hz)</h3>
-            <p id="inverterFrequency">--</p>
-          </div>
-          <div class="card">
-            <h3>Inverter Tempture (C)</h3>
-            <p id="inverterTempture">--</p>
-          </div>
-          <!-- <div class="card">
-            <h3>Line 1 Power (W)</h3>
-            <p id="powerL1">--</p>
-          </div>
-          <div class="card">
-            <h3>Line 1 Current (A)</h3>
-            <p id="currentL1">--</p>
-          </div>
-          <div class="card">
-            <h3>Line 2 Power (W)</h3>
-            <p id="powerL2">--</p>
-          </div>
-          <div class="card">
-            <h3>Line 2 Current (A)</h3>
-            <p id="currentL2">--</p>
-          </div> -->
-        </div>
-      </div>
-
-      <!-- Grid Group -->
-      <div class="group" id="gridGroup">
-        <h2>Grid</h2>
-        <div class="cards">
-          <div class="card">
-            <h3>Grid Voltage (V)</h3>
-            <p id="gridVoltage">--</p>
-          </div>
-          <div class="card">
-            <h3>Grid Current (A)</h3>
-            <p id="gridCurrent">--</p>
-          </div>
-          <div class="card">
-            <h3>Grid Power (W)</h3>
-            <p id="gridPower">--</p>
-          </div>
-          <div class="card">
-            <h3>Grid Frequency (Hz)</h3>
-            <p id="gridFrequency">--</p>
+            <h3>Total Load Current</h3>
+            <p id="loadTotalCurrent">--A</p>
           </div>
         </div>
       </div>
     </main>
 
     <script>
-      // Función para actualizar dashboard
-      function updateDashboard(data) {
-        // PV
-        document.getElementById("MpptState").textContent = data.MpptState;
-        document.getElementById("PvVoltage").textContent = data.PvVoltage;
-        document.getElementById("ChargerPower").textContent = data.ChargerPower;
-
-        // Grid
-        document.getElementById("gridVoltage").textContent =
-          data.gridVoltage ?? 0;
-
-        document.getElementById("gridCurrent").textContent =
-          data.gridCurrent ?? 0;
-
-        document.getElementById("gridPower").textContent = data.gridPower ?? 0;
-
-        document.getElementById("gridFrequency").textContent =
-          data.gridFrequency ?? 0;
-
-        // Battery
-        document.getElementById("batteryVoltage").textContent =
-          data.batteryVoltage;
-        document.getElementById("batteryCurrent").textContent =
-          data.batteryCurrent;
-        document.getElementById("batteryPower").textContent = data.batteryPower;
-
-        // Calcula SOC basado en voltage
-        function calculateBatterySOC(voltage) {
-          const Vmin = 42.8; // voltaje descarga mínima
-          const Vmax = 53; // voltaje máxima
-          let soc = ((voltage - Vmin) / (Vmax - Vmin)) * 100;
-          soc = Math.max(0, Math.min(100, soc)); // limitar entre 0 y 100%
-          return Math.round(soc);
-        }
-
-        // Battery SOC Circle
-        const batteryVoltage = data.batteryVoltage || 0;
-        const soc = calculateBatterySOC(batteryVoltage);
-        const circle = document.getElementById("BMS_Battery_SOC_Circle");
-        circle.textContent = soc + "%";
-        circle.style.background = `conic-gradient(${soc > 20 ? "#00cc66" : "#ff3300"} 0% ${soc}%, #ddd ${soc}% 100%)`;
-
-        // Battery Direction
-        const dir = data.batteryDirection || "unknown";
-        const pDir = document.getElementById("batteryDirection");
-        pDir.textContent = dir;
-        pDir.className =
-          dir === "charging"
-            ? "state-charging"
-            : dir === "discharging"
-              ? "state-discharging"
-              : "";
-
-        // Load
-        document.getElementById("loadPower").textContent = data.loadPower;
-        document.getElementById("loadPercent").textContent = data.loadPercent;
-
-        document.getElementById("inverterVoltage").textContent =
-          data.inverterVoltage;
-
-        document.getElementById("inverterFrequency").textContent =
-          data.inverterFrequency;
-
-        document.getElementById("inverterTempture").textContent =
-          data.acRadiatorTemperature;
-
-        //document.getElementById("powerL1").textContent = data.powerL1;
-        //document.getElementById("currentL1").textContent = data.currentL1;
-
-        //document.getElementById("powerL2").textContent = data.powerL2;
-        //document.getElementById("currentL2").textContent = data.currentL2;
+      // Color helper
+      function getTemperatureColor(temp) {
+        if (temp < 30) return "#22c55e";
+        if (temp < 40) return "#60a5fa";
+        if (temp < 50) return "#f97316";
+        return "#ef4444";
       }
 
-      // Fetch periódico
+      function getVoltageStatus(voltage, min = 180, max = 240) {
+        if (voltage < min || voltage > max) return "error";
+        if (Math.abs(voltage - 220) > 20) return "warning";
+        return "";
+      }
+
+      function formatPower(watts) {
+        if (watts >= 1000) return (watts / 1000).toFixed(2) + " kW";
+        return Math.round(watts) + " W";
+      }
+
+      // Main update function
+      function showInfo(section) {
+        const messages = {
+          powerFlow: "Shows flow of energy between solar, battery, grid and load. Arrows animate in direction of current power delivery.",
+          systemHealth: "Basic health metrics: temperatures, voltages, and battery statistics. Green/blue values are safe; orange/red warn of out-of-range.",
+          lines: "Detailed per-line output and load values. Useful to spot imbalances or missing voltage/current readings.",
+          grid: "Grid section displays the voltage/current/power coming from or going to the utility grid. Negative power means grid is supplying energy.",
+          solar: "Solar charger panel measurements: MPPT state, PV voltage and charger power. Zero power means no sun or MPPT off.",
+          loadSummary: "Aggregated load info. Calculates total voltage and current across both lines.",
+          MpptState: "Maximum Power Point Tracking status. 'Stop' means no solar activity, 'MPPT' means searching for optimal PV voltage.",
+          PvVoltage: "Voltage from the solar panels to the charger; reflects panel output under current illumination.",
+          chChargerCurrent: "Current delivered by the solar charger to the battery; high only when MPPT active.",
+          ChargerPower: "Instantaneous solar power entering the system.",
+          batteryVoltage: "Voltage of the battery bank; used to estimate state-of-charge.",
+          batteryCurrent: "Positive when discharging, negative when charging (from battery perspective).",
+          batteryPower: "Real power into or out of battery; sign indicates direction.",
+          loadPower: "Total power consumed by the house loads.",
+          loadPercent: "Percentage of inverter capacity currently used.",
+          inverterVoltage: "Output voltage of the inverter; should match grid when tied.",
+          inverterFrequency: "Output frequency; typically 50 or 60Hz and should match grid.",
+          gridVoltage: "Voltage provided by the utility grid.",
+          gridCurrent: "Current drawn from or sent to the grid (negative sign means grid supplying).",
+          gridPower: "Net power exchanged with grid; negative indicates import.",
+          gridFrequency: "Frequency of the grid supply.",
+        };
+        const title = section.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('modalText').textContent = messages[section] || "No help available for this item.";
+        document.getElementById('infoModal').style.display = 'flex';
+      }
+      function hideModal() {
+        document.getElementById('infoModal').style.display = 'none';
+      }
+
+      function updateDashboard(data) {
+        // Status Bar
+        const modeMap = {
+          "PowerOn": "Power On",
+          "SelfTest": "Self Test",
+          "OffGrid": "Off Grid",
+          "Grid-Tie": "Grid Tie",
+          "Bypass": "Bypass Mode",
+          "Stop": "Stopped",
+          "Grid Charging": "Grid Charging"
+        };
+
+        const mode = modeMap[data.workState] || data.workState || "--";
+        const modeBadge = document.getElementById("modesStatus");
+        modeBadge.textContent = mode;
+        modeBadge.className = "status-badge " + data.workState?.toLowerCase().replace(/ /g, "-") || "unknown";
+
+        // Battery Direction
+        const batteryDir = data.batteryDirection || "unknown";
+        const batteryBadge = document.getElementById("batteryDirStatus");
+        batteryBadge.textContent = batteryDir.toUpperCase();
+        batteryBadge.className = "status-badge " + batteryDir.toLowerCase();
+
+        // Power Source
+        const powerSource = data.houseConsumptionSource || "unknown";
+        const sourceText = {
+          "grid": "Grid 🌐",
+          "battery": "Battery 🔋",
+          "solar": "Solar ☀️",
+          "mixed/low": "Mixed"
+        }[powerSource] || powerSource;
+        document.getElementById("powerSourceStatus").textContent = sourceText;
+
+        // Frequency Status
+        const freqStatus = document.getElementById("frequencyStatus");
+        freqStatus.textContent = (data.gridFrequency || data.inverterFrequency || 0).toFixed(1);
+        if (Math.abs((data.gridFrequency || 0) - (data.inverterFrequency || 0)) > 0.5) {
+          freqStatus.style.color = "#f97316";
+        } else {
+          freqStatus.style.color = "#22c55e";
+        }
+
+        // Power Flow
+        document.getElementById("pvPower").textContent = formatPower(data.ChargerPower || 0);
+        document.getElementById("batteryStatus").textContent = (data.batteryVoltage || 0).toFixed(1) + "V";
+        document.getElementById("flowLoad").textContent = "Load: " + formatPower(data.loadPower || 0);
+
+        // Update flow direction
+        const flowBattery = document.getElementById("flowBattery");
+        if (batteryDir === "charging") {
+          flowBattery.textContent = "CHARGING 🔋";
+          flowBattery.style.color = "#22c55e";
+        } else if (batteryDir === "discharging") {
+          flowBattery.textContent = "DISCHARGING 🔋";
+          flowBattery.style.color = "#f43f5e";
+        } else {
+          flowBattery.textContent = "IDLE 🔋";
+          flowBattery.style.color = "#94a3b8";
+        }
+
+        // System Health
+        const temp = data.acRadiatorTemperature || 0;
+        const tempElement = document.getElementById("tempStatus");
+        tempElement.textContent = temp + "°C";
+        tempElement.style.color = getTemperatureColor(temp);
+
+        document.getElementById("inverterVoltage").textContent = (data.inverterVoltage || 0).toFixed(1) + "V";
+        document.getElementById("gridVoltage").textContent = (data.gridVoltage || 0).toFixed(1) + "V";
+        document.getElementById("batteryVoltage").textContent = (data.batteryVoltage || 0).toFixed(1) + "V";
+        document.getElementById("batteryCurrent").textContent = (data.batteryCurrent || 0).toFixed(1) + "A";
+        document.getElementById("batteryPower").textContent = formatPower(data.batteryPower || 0);
+
+        // Line 1 Output
+        document.getElementById("l1Voltage").textContent = (data.inverterVoltageL1 || 0).toFixed(1) + "V";
+        document.getElementById("l1Current").textContent = (data.inverterCurrentL1 || 0).toFixed(1) + "A";
+        document.getElementById("l1Power").textContent = formatPower(data.inverterPowerL1 || 0);
+
+        // Line 1 Load
+        const l1LoadVoltage = data.loadVoltageL1 || 0;
+        const l1LoadCurrent = data.loadCurrentL1 || 0;
+        document.getElementById("l1LoadVoltage").textContent = l1LoadVoltage.toFixed(1) + "V";
+        document.getElementById("l1LoadCurrent").textContent = l1LoadCurrent.toFixed(1) + "A";
+        document.getElementById("l1LoadPower").textContent = formatPower(l1LoadVoltage * l1LoadCurrent);
+
+        // Line 2 Output
+        document.getElementById("l2Voltage").textContent = (data.inverterVoltageL2 || 0).toFixed(1) + "V";
+        document.getElementById("l2Current").textContent = (data.inverterCurrentL2 || 0).toFixed(1) + "A";
+        document.getElementById("l2Power").textContent = formatPower(data.inverterPowerL2 || 0);
+
+        // Line 2 Load
+        const l2LoadVoltage = data.loadVoltageL2 || 0;
+        const l2LoadCurrent = data.loadCurrentL2 || 0;
+        document.getElementById("l2LoadVoltage").textContent = l2LoadVoltage.toFixed(1) + "V";
+        document.getElementById("l2LoadCurrent").textContent = l2LoadCurrent.toFixed(1) + "A";
+        document.getElementById("l2LoadPower").textContent = formatPower(l2LoadVoltage * l2LoadCurrent);
+
+        // Line Imbalance Warning
+        const imbalanceWarning = document.getElementById("lineImbalanceWarning");
+        const l1Power = data.inverterPowerL1 || 0;
+        const l2Power = data.inverterPowerL2 || 0;
+        const maxPower = Math.max(Math.abs(l1Power), Math.abs(l2Power));
+        if (maxPower > 100) {
+          const imbalance = Math.abs(l1Power - l2Power) / maxPower * 100;
+          if (imbalance > 20) {
+            imbalanceWarning.innerHTML = `<div class="warning-box">⚠️ Line Imbalance Detected: ${imbalance.toFixed(1)}% - Try to distribute load equally between L1 and L2</div>`;
+          }
+        } else {
+          imbalanceWarning.innerHTML = "";
+        }
+
+        // Grid
+        document.getElementById("gridVoltageCard").textContent = (data.gridVoltage || 0).toFixed(1) + "V";
+        document.getElementById("gridCurrent").textContent = (data.gridCurrent || 0).toFixed(1) + "A";
+        document.getElementById("gridPowerCard").textContent = formatPower(data.gridPower || 0);
+        document.getElementById("gridFrequency").textContent = (data.gridFrequency || 0).toFixed(2) + " Hz";
+
+        // Solar
+        document.getElementById("MpptState").textContent = data.MpptState || "--";
+        document.getElementById("PvVoltage").textContent = (data.PvVoltage || 0).toFixed(1) + "V";
+        document.getElementById("chChargerCurrent").textContent = (data.chChargerCurrent || 0).toFixed(1) + "A";
+        document.getElementById("ChargerPower").textContent = formatPower(data.ChargerPower || 0);
+
+        // Load
+        document.getElementById("loadPower").textContent = formatPower(data.loadPower || 0);
+        document.getElementById("loadPercent").textContent = (data.loadPercent || 0) + "%";
+        const totalLoadVoltage = ((data.loadVoltageL1 || 0) + (data.loadVoltageL2 || 0)) / 2;
+        const totalLoadCurrent = (data.loadCurrentL1 || 0) + (data.loadCurrentL2 || 0);
+        document.getElementById("loadTotalVoltage").textContent = totalLoadVoltage.toFixed(1) + "V";
+        document.getElementById("loadTotalCurrent").textContent = totalLoadCurrent.toFixed(1) + "A";
+
+        // Data anomaly detection
+        if ((data.inverterVoltageL1 === 0 && data.inverterCurrentL1 > 1) ||
+            (data.inverterVoltageL2 === 0 && data.inverterCurrentL2 > 1) ||
+            (data.inverterCurrentL1 === 0 && data.inverterVoltageL1 > 50) ||
+            (data.inverterCurrentL2 === 0 && data.inverterVoltageL2 > 50)) {
+          const warningMsg = document.querySelector(".group h2");
+          if (warningMsg) {
+            const warning = document.createElement("div");
+            warning.className = "warning-box";
+            warning.innerHTML = "⚠️ Data Anomaly: Line voltage/current mismatch detected. Check hardware connections.";
+            const lineGroup = document.querySelectorAll(".group")[2];
+            if (!lineGroup.querySelector(".warning-box")) {
+              lineGroup.appendChild(warning);
+            }
+          }
+        }
+      }
+
+      // Fetch data
       async function fetchData() {
         try {
           const res = await fetch("/data");
