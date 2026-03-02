@@ -214,7 +214,7 @@ def calculate_derived_metrics(data):
     if data.get("gridVoltage") > 0:
         # grid is supplying energy into inverter/battery/load
         derived["houseConsumptionSource"] = "grid"
-    elif battery_power is not None and battery_power < -50:
+    elif battery_power is not None and battery_power > 0:
         # battery is discharging (power leaving battery to house)
         derived["houseConsumptionSource"] = "battery"
     elif charger_power > 50:

@@ -588,11 +588,10 @@
             <span id="pvPower" style="color: #22c55e">0W</span>
           </div>
           <div class="flow-center">
-            <div id="flowGrid" style="color: #60a5fa">Grid ✓</div>
-            <div class="flow-arrow">⟵ ⟶</div>
-            <div id="flowBattery" style="color: #22c55e">CHARGING 🔋</div>
-            <div class="flow-arrow"></div>
+            <div class="power-source-icon">⚡</div>
+            <strong>Inverter</strong>
             <div id="flowLoad" style="color: #94a3b8">Load: 0W</div>
+            <div id="load-percent">--%</div>
           </div>
           <div class="power-source">
             <div class="power-source-icon" id="batteryIcon">🔋</div>
@@ -866,19 +865,6 @@
         document.getElementById("batteryStatus").textContent = (data.batteryVoltage || 0).toFixed(1) + "V";
         document.getElementById("flowLoad").textContent = "Load: " + formatPower(data.loadPower || 0);
 
-        // Update flow direction
-        const flowBattery = document.getElementById("flowBattery");
-        if (batteryDir === "charging") {
-          flowBattery.textContent = "CHARGING 🔋";
-          flowBattery.style.color = "#22c55e";
-        } else if (batteryDir === "discharging") {
-          flowBattery.textContent = "DISCHARGING 🔋";
-          flowBattery.style.color = "#f43f5e";
-        } else {
-          flowBattery.textContent = "IDLE 🔋";
-          flowBattery.style.color = "#94a3b8";
-        }
-
         // System Health
         const temp = data.acRadiatorTemperature || 0;
         const tempElement = document.getElementById("tempStatus");
@@ -944,6 +930,7 @@
         // Load
         document.getElementById("loadPower").textContent = formatPower(data.loadPower || 0);
         document.getElementById("loadPercent").textContent = (data.loadPercent || 0) + "%";
+        document.getElementById("load-percent").textContent = (data.loadPercent || 0) + "%";
         const totalLoadVoltage = ((data.loadVoltageL1 || 0) + (data.loadVoltageL2 || 0)) / 2;
         const totalLoadCurrent = (data.loadCurrentL1 || 0) + (data.loadCurrentL2 || 0);
         document.getElementById("loadTotalVoltage").textContent = totalLoadVoltage.toFixed(1) + "V";
