@@ -632,68 +632,9 @@
         </div>
       </div>
 
-      <!-- Output Lines -->
-      <div class="group">
-        <h2>📊 Output Lines (L1 & L2) <span class="info-icon" onclick="showInfo('lines')">❔</span></h2>
-        <div class="line-cards">
-          <div class="line-card">
-            <h4>Line 1</h4>
-            <div class="line-metric">
-              <span>Voltage:</span>
-              <span id="l1Voltage">0.0V</span>
-            </div>
-            <div class="line-metric">
-              <span>Current:</span>
-              <span id="l1Current">0.0A</span>
-            </div>
-            <div class="line-metric">
-              <span>Power:</span>
-              <span id="l1Power">0W</span>
-            </div>
-            <div class="line-metric">
-              <span>Load Voltage:</span>
-              <span id="l1LoadVoltage">0.0V</span>
-            </div>
-            <div class="line-metric">
-              <span>Load Current:</span>
-              <span id="l1LoadCurrent">0.0A</span>
-            </div>
-            <div class="line-metric">
-              <span>Load Power:</span>
-              <span id="l1LoadPower">0W</span>
-            </div>
-          </div>
-          <div class="line-card">
-            <h4>Line 2</h4>
-            <div class="line-metric">
-              <span>Voltage:</span>
-              <span id="l2Voltage">0.0V</span>
-            </div>
-            <div class="line-metric">
-              <span>Current:</span>
-              <span id="l2Current">0.0A</span>
-            </div>
-            <div class="line-metric">
-              <span>Power:</span>
-              <span id="l2Power">0W</span>
-            </div>
-            <div class="line-metric">
-              <span>Load Voltage:</span>
-              <span id="l2LoadVoltage">0.0V</span>
-            </div>
-            <div class="line-metric">
-              <span>Load Current:</span>
-              <span id="l2LoadCurrent">0.0A</span>
-            </div>
-            <div class="line-metric">
-              <span>Load Power:</span>
-              <span id="l2LoadPower">0W</span>
-            </div>
-          </div>
-        </div>
-        <div id="lineImbalanceWarning"></div>
-      </div>
-
+      <!-- Grid Section -->
+      <!-- Grid Section -->
+      <!-- Grid Section -->
       <!-- Grid Section -->
       <div class="group">
         <h2>🌐 Grid Status <span class="info-icon" onclick="showInfo('grid')">❔</span></h2>
@@ -751,14 +692,6 @@
           <div class="card">
             <h3>Load Percent <span class="info-icon" onclick="showInfo('loadPercent')">❔</span></h3>
             <p id="loadPercent">--%</p>
-          </div>
-          <div class="card">
-            <h3>Total Load Voltage</h3>
-            <p id="loadTotalVoltage">--V</p>
-          </div>
-          <div class="card">
-            <h3>Total Load Current</h3>
-            <p id="loadTotalCurrent">--A</p>
           </div>
         </div>
       </div>
@@ -877,43 +810,6 @@
         document.getElementById("batteryCurrent").textContent = (data.batteryCurrent || 0).toFixed(1) + "A";
         document.getElementById("batteryPower").textContent = formatPower(data.batteryPower || 0);
 
-        // Line 1 Output
-        document.getElementById("l1Voltage").textContent = (data.inverterVoltageL1 || 0).toFixed(1) + "V";
-        document.getElementById("l1Current").textContent = (data.inverterCurrentL1 || 0).toFixed(1) + "A";
-        document.getElementById("l1Power").textContent = formatPower(data.inverterPowerL1 || 0);
-
-        // Line 1 Load
-        const l1LoadVoltage = data.loadVoltageL1 || 0;
-        const l1LoadCurrent = data.loadCurrentL1 || 0;
-        document.getElementById("l1LoadVoltage").textContent = l1LoadVoltage.toFixed(1) + "V";
-        document.getElementById("l1LoadCurrent").textContent = l1LoadCurrent.toFixed(1) + "A";
-        document.getElementById("l1LoadPower").textContent = formatPower(l1LoadVoltage * l1LoadCurrent);
-
-        // Line 2 Output
-        document.getElementById("l2Voltage").textContent = (data.inverterVoltageL2 || 0).toFixed(1) + "V";
-        document.getElementById("l2Current").textContent = (data.inverterCurrentL2 || 0).toFixed(1) + "A";
-        document.getElementById("l2Power").textContent = formatPower(data.inverterPowerL2 || 0);
-
-        // Line 2 Load
-        const l2LoadVoltage = data.loadVoltageL2 || 0;
-        const l2LoadCurrent = data.loadCurrentL2 || 0;
-        document.getElementById("l2LoadVoltage").textContent = l2LoadVoltage.toFixed(1) + "V";
-        document.getElementById("l2LoadCurrent").textContent = l2LoadCurrent.toFixed(1) + "A";
-        document.getElementById("l2LoadPower").textContent = formatPower(l2LoadVoltage * l2LoadCurrent);
-
-        // Line Imbalance Warning
-        const imbalanceWarning = document.getElementById("lineImbalanceWarning");
-        const l1Power = data.inverterPowerL1 || 0;
-        const l2Power = data.inverterPowerL2 || 0;
-        const maxPower = Math.max(Math.abs(l1Power), Math.abs(l2Power));
-        if (maxPower > 100) {
-          const imbalance = Math.abs(l1Power - l2Power) / maxPower * 100;
-          if (imbalance > 20) {
-            imbalanceWarning.innerHTML = `<div class="warning-box">⚠️ Line Imbalance Detected: ${imbalance.toFixed(1)}% - Try to distribute load equally between L1 and L2</div>`;
-          }
-        } else {
-          imbalanceWarning.innerHTML = "";
-        }
 
         // Grid
         document.getElementById("gridVoltageCard").textContent = (data.gridVoltage || 0).toFixed(1) + "V";
@@ -931,27 +827,7 @@
         document.getElementById("loadPower").textContent = formatPower(data.loadPower || 0);
         document.getElementById("loadPercent").textContent = (data.loadPercent || 0) + "%";
         document.getElementById("load-percent").textContent = (data.loadPercent || 0) + "%";
-        const totalLoadVoltage = ((data.loadVoltageL1 || 0) + (data.loadVoltageL2 || 0)) / 2;
-        const totalLoadCurrent = (data.loadCurrentL1 || 0) + (data.loadCurrentL2 || 0);
-        document.getElementById("loadTotalVoltage").textContent = totalLoadVoltage.toFixed(1) + "V";
-        document.getElementById("loadTotalCurrent").textContent = totalLoadCurrent.toFixed(1) + "A";
 
-        // Data anomaly detection
-        if ((data.inverterVoltageL1 === 0 && data.inverterCurrentL1 > 1) ||
-            (data.inverterVoltageL2 === 0 && data.inverterCurrentL2 > 1) ||
-            (data.inverterCurrentL1 === 0 && data.inverterVoltageL1 > 50) ||
-            (data.inverterCurrentL2 === 0 && data.inverterVoltageL2 > 50)) {
-          const warningMsg = document.querySelector(".group h2");
-          if (warningMsg) {
-            const warning = document.createElement("div");
-            warning.className = "warning-box";
-            warning.innerHTML = "⚠️ Data Anomaly: Line voltage/current mismatch detected. Check hardware connections.";
-            const lineGroup = document.querySelectorAll(".group")[2];
-            if (!lineGroup.querySelector(".warning-box")) {
-              lineGroup.appendChild(warning);
-            }
-          }
-        }
       }
 
       // Fetch data

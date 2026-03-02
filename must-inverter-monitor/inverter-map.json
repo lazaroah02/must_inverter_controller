@@ -1,0 +1,482 @@
+{
+  "10000": {
+    "raw": 20547,
+    "scaled": 20547,
+    "info": null
+  },
+  "10001": {
+    "raw": 1800,
+    "scaled": 1800,
+    "info": null
+  },
+  "10103": {
+    "raw": 540,
+    "scaled": 540,
+    "info": null
+  },
+  "10104": {
+    "raw": 564,
+    "scaled": 564,
+    "info": null
+  },
+  "10105": {
+    "raw": 420,
+    "scaled": 420,
+    "info": null
+  },
+  "10108": {
+    "raw": 1000,
+    "scaled": 1000,
+    "info": null
+  },
+  "10110": {
+    "raw": 2,
+    "scaled": 2,
+    "info": null
+  },
+  "15201": {
+    "raw": 2,
+    "scaled": 2,
+    "info": {
+      "name": "ChargerWorkstate",
+      "description": "Charger Workstate",
+      "scale": 1,
+      "type": "map"
+    }
+  },
+  "15202": {
+    "raw": 2,
+    "scaled": 2,
+    "info": {
+      "name": "MpptState",
+      "description": "Mppt State",
+      "scale": 1,
+      "type": "map"
+    }
+  },
+  "15203": {
+    "raw": 2,
+    "scaled": 2,
+    "info": null
+  },
+  "15205": {
+    "raw": 1336,
+    "scaled": 133.6,
+    "info": {
+      "name": "PvVoltage",
+      "description": "Pv Voltage",
+      "scale": 0.1,
+      "type": "V"
+    }
+  },
+  "15206": {
+    "raw": 548,
+    "scaled": 54.8,
+    "info": {
+      "name": "chBatteryVoltage",
+      "description": "Ch Battery Voltage",
+      "scale": 0.1,
+      "type": "V"
+    }
+  },
+  "15207": {
+    "raw": 109,
+    "scaled": 10.9,
+    "info": {
+      "name": "chChargerCurrent",
+      "description": "Ch Charger Current",
+      "scale": 0.1,
+      "type": "A"
+    }
+  },
+  "15208": {
+    "raw": 496,
+    "scaled": 496,
+    "info": {
+      "name": "ChargerPower",
+      "description": "Charger Power",
+      "scale": 1,
+      "type": "W"
+    }
+  },
+  "15209": {
+    "raw": 49,
+    "scaled": 49,
+    "info": null
+  },
+  "15218": {
+    "raw": 1084,
+    "scaled": 1084,
+    "info": null
+  },
+  "15219": {
+    "raw": 18,
+    "scaled": 18,
+    "info": null
+  },
+  "15220": {
+    "raw": 17,
+    "scaled": 17,
+    "info": null
+  },
+  "15221": {
+    "raw": 4,
+    "scaled": 4,
+    "info": null
+  },
+  "20000": {
+    "raw": 20566,
+    "scaled": 20566,
+    "info": null
+  },
+  "20001": {
+    "raw": 3300,
+    "scaled": 3300,
+    "info": null
+  },
+  "20002": {
+    "raw": 65535,
+    "scaled": 65535,
+    "info": null
+  },
+  "20003": {
+    "raw": 65535,
+    "scaled": 65535,
+    "info": null
+  },
+  "20004": {
+    "raw": 1,
+    "scaled": 1,
+    "info": null
+  },
+  "20005": {
+    "raw": 2109,
+    "scaled": 2109,
+    "info": null
+  },
+  "20006": {
+    "raw": 10414,
+    "scaled": 10414,
+    "info": null
+  },
+  "20009": {
+    "raw": 16384,
+    "scaled": 16384,
+    "info": null
+  },
+  "20010": {
+    "raw": 16384,
+    "scaled": 16384,
+    "info": null
+  },
+  "20011": {
+    "raw": 16384,
+    "scaled": 16384,
+    "info": null
+  },
+  "20016": {
+    "raw": 16384,
+    "scaled": 16384,
+    "info": null
+  },
+  "20020": {
+    "raw": 16384,
+    "scaled": 16384,
+    "info": null
+  },
+  "20021": {
+    "raw": 16384,
+    "scaled": 16384,
+    "info": null
+  },
+  "20101": {
+    "raw": 1,
+    "scaled": 1,
+    "info": null
+  },
+  "20102": {
+    "raw": 1200,
+    "scaled": 1200,
+    "info": null
+  },
+  "20103": {
+    "raw": 6000,
+    "scaled": 6000,
+    "info": null
+  },
+  "20109": {
+    "raw": 3,
+    "scaled": 3,
+    "info": {
+      "name": "EnergyUseMode",
+      "description": "Energy use mode",
+      "scale": 1,
+      "type": "map"
+    }
+  },
+  "20118": {
+    "raw": 460,
+    "scaled": 460,
+    "info": null
+  },
+  "20119": {
+    "raw": 540,
+    "scaled": 540,
+    "info": null
+  },
+  "20125": {
+    "raw": 400,
+    "scaled": 400,
+    "info": null
+  },
+  "20127": {
+    "raw": 420,
+    "scaled": 420,
+    "info": null
+  },
+  "20128": {
+    "raw": 603,
+    "scaled": 603,
+    "info": null
+  },
+  "20132": {
+    "raw": 800,
+    "scaled": 800,
+    "info": null
+  },
+  "20143": {
+    "raw": 2,
+    "scaled": 2,
+    "info": null
+  },
+  "20146": {
+    "raw": 10,
+    "scaled": 10,
+    "info": null
+  },
+  "20147": {
+    "raw": 30,
+    "scaled": 30,
+    "info": null
+  },
+  "20148": {
+    "raw": 80,
+    "scaled": 80,
+    "info": null
+  },
+  "20149": {
+    "raw": 17,
+    "scaled": 17,
+    "info": null
+  },
+  "25201": {
+    "raw": 2,
+    "scaled": 2,
+    "info": {
+      "name": "workState",
+      "description": "Work state",
+      "scale": 1,
+      "type": "map"
+    }
+  },
+  "25202": {
+    "raw": 120,
+    "scaled": 120,
+    "info": null
+  },
+  "25203": {
+    "raw": 6000,
+    "scaled": 6000,
+    "info": null
+  },
+  "25205": {
+    "raw": 537,
+    "scaled": 53.7,
+    "info": {
+      "name": "batteryVoltage",
+      "description": "Battery voltage",
+      "scale": 0.1,
+      "type": "V"
+    }
+  },
+  "25206": {
+    "raw": 2410,
+    "scaled": 241.0,
+    "info": {
+      "name": "inverterVoltage",
+      "description": "Inverter voltage",
+      "scale": 0.1,
+      "type": "V"
+    }
+  },
+  "25213": {
+    "raw": 2524,
+    "scaled": 2524,
+    "info": {
+      "name": "inverterPower",
+      "description": "Inverter power",
+      "scale": 1,
+      "type": "W"
+    }
+  },
+  "25215": {
+    "raw": 2151,
+    "scaled": 2151,
+    "info": {
+      "name": "loadPower",
+      "description": "Load power",
+      "scale": 1,
+      "type": "W"
+    }
+  },
+  "25216": {
+    "raw": 64,
+    "scaled": 64,
+    "info": {
+      "name": "loadPercent",
+      "description": "Load percent",
+      "scale": 1,
+      "type": "%"
+    }
+  },
+  "25219": {
+    "raw": 2281,
+    "scaled": 2281,
+    "info": null
+  },
+  "25225": {
+    "raw": 6000,
+    "scaled": 60.0,
+    "info": {
+      "name": "inverterFrequency",
+      "description": "Inverter frequency",
+      "scale": 0.01,
+      "type": "Hz"
+    }
+  },
+  "25233": {
+    "raw": 31,
+    "scaled": 31,
+    "info": {
+      "name": "acRadiatorTemperature",
+      "description": "AC radiator temperature",
+      "scale": 1,
+      "type": "C"
+    }
+  },
+  "25235": {
+    "raw": 31,
+    "scaled": 31,
+    "info": null
+  },
+  "25246": {
+    "raw": 800,
+    "scaled": 80.0,
+    "info": {
+      "name": "alt_voltageL1",
+      "description": "Alt inverter voltage L1",
+      "scale": 0.1,
+      "type": "V"
+    }
+  },
+  "25248": {
+    "raw": 672,
+    "scaled": 67.2,
+    "info": {
+      "name": "inverterVoltageL2",
+      "description": "Inverter voltage L2",
+      "scale": 0.1,
+      "type": "V"
+    }
+  },
+  "25250": {
+    "raw": 264,
+    "scaled": 26.4,
+    "info": {
+      "name": "inverterCurrentL1",
+      "description": "Inverter current L1",
+      "scale": 0.1,
+      "type": "A"
+    }
+  },
+  "25254": {
+    "raw": 1126,
+    "scaled": 112.6,
+    "info": {
+      "name": "alt_currentL2",
+      "description": "Alt inverter current L2",
+      "scale": 0.1,
+      "type": "A"
+    }
+  },
+  "25260": {
+    "raw": 234,
+    "scaled": 23.4,
+    "info": {
+      "name": "loadCurrentL1",
+      "description": "Load current L1",
+      "scale": 0.1,
+      "type": "A"
+    }
+  },
+  "25269": {
+    "raw": 65535,
+    "scaled": 65535,
+    "info": null
+  },
+  "25270": {
+    "raw": 65535,
+    "scaled": 65535,
+    "info": null
+  },
+  "25271": {
+    "raw": 1,
+    "scaled": 1,
+    "info": null
+  },
+  "25272": {
+    "raw": 2109,
+    "scaled": 2109,
+    "info": null
+  },
+  "25273": {
+    "raw": 2002,
+    "scaled": 2002,
+    "info": {
+      "name": "batteryPower",
+      "description": "Battery power",
+      "scale": 1,
+      "type": "W"
+    }
+  },
+  "25274": {
+    "raw": 37,
+    "scaled": 37,
+    "info": {
+      "name": "batteryCurrent",
+      "description": "Battery current",
+      "scale": 1,
+      "type": "A"
+    }
+  },
+  "25275": {
+    "raw": 48,
+    "scaled": 48,
+    "info": null
+  },
+  "25277": {
+    "raw": 6000,
+    "scaled": 6000,
+    "info": null
+  },
+  "25278": {
+    "raw": 10414,
+    "scaled": 10414,
+    "info": null
+  },
+  "25279": {
+    "raw": 183,
+    "scaled": 183,
+    "info": null
+  }
+}

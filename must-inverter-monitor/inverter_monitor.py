@@ -60,14 +60,11 @@ register_map = {
     25233: ["acRadiatorTemperature", "AC radiator temperature", 1, "C"],
     # note: some firmware versions use offset addresses.  Primary below matches
     # documentation, but fallback 25246 and 25254 are read programmatically.
-    25247: ["inverterVoltageL1", "Inverter voltage L1", 0.1, "V"],
-    25248: ["inverterVoltageL2", "Inverter voltage L2", 0.1, "V"],
-    25250: ["inverterCurrentL1", "Inverter current L1", 0.1, "A"],
-    25251: ["inverterCurrentL2", "Inverter current L2", 0.1, "A"],
-    25257: ["loadVoltageL1", "Load voltage L1", 0.1, "V"],
-    25258: ["loadVoltageL2", "Load voltage L2", 0.1, "V"],
-    25260: ["loadCurrentL1", "Load current L1", 0.1, "A"],
-    25261: ["loadCurrentL2", "Load current L2", 0.1, "A"],
+    # primary documented registers
+    # the following line-specific registers were removed per user request
+    # genset registers from documentation (kW values - not inverter lines)
+    40031: ["gensetPowerL1", "Genset power L1", 1000, "W"],
+    40032: ["gensetPowerL2", "Genset power L2", 1000, "W"],
     25273: ["batteryPower", "Battery power", 1, "W"],
     25274: ["batteryCurrent", "Battery current", 1, "A"],
 
@@ -141,6 +138,17 @@ def read_int32(instrument, register, scale=1):
 def save_data(data):
     data["timestamp"] = datetime.utcnow().isoformat()
 
+    # remove any leftover line-specific keys that may have been logged
+    # previously
+    for k in list(data.keys()):
+        if k.endswith("L1") or k.endswith("L2"):
+            # common prefixes for obsolete line metrics
+            if any(k.startswith(p) for p in [
+                "inverterVoltage", "inverterCurrent", "loadVoltage",
+                "loadCurrent", "inverterPower", "loadPower", "current"
+            ]):
+                data.pop(k, None)
+
     if not os.path.exists(OUTPUT_FILE):
         with open(OUTPUT_FILE, "w") as f:
             json.dump([data], f, indent=4)
@@ -173,58 +181,8 @@ def calculate_derived_metrics(data):
     charger_power = data.get("ChargerPower", 0)
     soc = data.get("BMS_Battery_SOC")
 
-    # Old method for line currents (INT32)
-    l1_current = data.get("currentL1")
-    l2_current = data.get("currentL2")
-    inverter_voltage = data.get("inverterVoltage")
+    # we now only track aggregate inverter values
 
-    # NEW: Get individual line data from registers
-    inverter_voltage_l1 = data.get("inverterVoltageL1")
-    inverter_voltage_l2 = data.get("inverterVoltageL2")
-    inverter_current_l1 = data.get("inverterCurrentL1")
-    inverter_current_l2 = data.get("inverterCurrentL2")
-    
-    # if line voltages are wildly off from half of inverterVoltage, override
-    inv_volt = data.get("inverterVoltage")
-    if inv_volt is not None:
-        half = round(inv_volt / 2, 2)
-        # check if either value is missing or differs significantly (>20V)
-        if inverter_voltage_l1 is None or abs(inverter_voltage_l1 - half) > 20:
-            inverter_voltage_l1 = half
-        if inverter_voltage_l2 is None or abs(inverter_voltage_l2 - half) > 20:
-            inverter_voltage_l2 = half
-    # fallback currents: if unavailable or zero, split total power evenly
-    total_power = data.get("inverterPower")
-    # recalc currents if missing or clearly wrong (>50A)
-    if total_power and (inverter_current_l1 is None or inverter_current_l1 <= 0 or inverter_current_l1 > 50):
-        if inverter_voltage_l1:
-            inverter_current_l1 = round((total_power / 2) / inverter_voltage_l1, 2)
-    if total_power and (inverter_current_l2 is None or inverter_current_l2 <= 0 or inverter_current_l2 > 50):
-        if inverter_voltage_l2:
-            inverter_current_l2 = round((total_power / 2) / inverter_voltage_l2, 2)
-    # if estimated line powers don't sum to something near total, split evenly
-    if total_power and inverter_voltage_l1 and inverter_voltage_l2:
-        est1 = (inverter_voltage_l1 * inverter_current_l1) if inverter_current_l1 else 0
-        est2 = (inverter_voltage_l2 * inverter_current_l2) if inverter_current_l2 else 0
-        if abs((est1 + est2) - total_power) > abs(total_power) * 0.5:
-            # recalc both currents equally
-            inverter_current_l1 = round((total_power / 2) / inverter_voltage_l1, 2)
-            inverter_current_l2 = round((total_power / 2) / inverter_voltage_l2, 2)
-
-    load_voltage_l1 = data.get("loadVoltageL1")
-    load_voltage_l2 = data.get("loadVoltageL2")
-    load_current_l1 = data.get("loadCurrentL1")
-    load_current_l2 = data.get("loadCurrentL2")
-
-    # propagate any corrected line voltages/currents back into data
-    if inverter_voltage_l1 is not None:
-        derived["inverterVoltageL1"] = inverter_voltage_l1
-    if inverter_voltage_l2 is not None:
-        derived["inverterVoltageL2"] = inverter_voltage_l2
-    if inverter_current_l1 is not None:
-        derived["inverterCurrentL1"] = inverter_current_l1
-    if inverter_current_l2 is not None:
-        derived["inverterCurrentL2"] = inverter_current_l2
 
     # Battery calculated power
     if battery_voltage is not None and battery_current is not None:
@@ -247,9 +205,12 @@ def calculate_derived_metrics(data):
 
     # Grid dependency
     if load_power > 0:
-        derived["gridDependencyPercent"] = round((grid_power / load_power) * 100, 2)
+        derived["gridDependencyPercent"] = round(
+            (grid_power / load_power) * 100, 2
+        )
 
-    # Consumption source - gridPower is negative when grid is feeding the system
+    # Consumption source - gridPower is negative when grid
+    # is feeding the system
     if data.get("gridVoltage") > 0:
         # grid is supplying energy into inverter/battery/load
         derived["houseConsumptionSource"] = "grid"
@@ -276,74 +237,7 @@ def calculate_derived_metrics(data):
             (load_power / input_power) * 100, 2
         )
 
-    # ==========================================
-    # NEW: Individual Line Power Calculations
-    # ==========================================
-    
-    # Line 1 Inverter Power (Register-based)
-    if inverter_voltage_l1 is not None and inverter_current_l1 is not None:
-        derived["inverterPowerL1"] = round(inverter_voltage_l1 * inverter_current_l1, 2)
-
-    # Line 2 Inverter Power (Register-based)
-    if inverter_voltage_l2 is not None and inverter_current_l2 is not None:
-        derived["inverterPowerL2"] = round(inverter_voltage_l2 * inverter_current_l2, 2)
-
-    # Load Line 1 Power (Register-based)
-    if load_voltage_l1 is not None and load_current_l1 is not None:
-        derived["loadPowerL1"] = round(load_voltage_l1 * load_current_l1, 2)
-
-    # Load Line 2 Power (Register-based)
-    if load_voltage_l2 is not None and load_current_l2 is not None:
-        derived["loadPowerL2"] = round(load_voltage_l2 * load_current_l2, 2)
-
-    # Total Line Power (sum of both lines)
-    if "inverterPowerL1" in derived and "inverterPowerL2" in derived:
-        derived["inverterPowerTotal"] = round(
-            derived["inverterPowerL1"] + derived["inverterPowerL2"], 2
-        )
-
-    if "loadPowerL1" in derived and "loadPowerL2" in derived:
-        derived["loadPowerTotal"] = round(
-            derived["loadPowerL1"] + derived["loadPowerL2"], 2
-        )
-
-    # Phase Imbalance (Inverter)
-    if "inverterPowerL1" in derived and "inverterPowerL2" in derived:
-        max_inv_power = max(
-            abs(derived["inverterPowerL1"]), abs(derived["inverterPowerL2"])
-        )
-        if max_inv_power > 0:
-            derived["inverterPhaseImbalancePercent"] = round(
-                abs(
-                    derived["inverterPowerL1"] - derived["inverterPowerL2"]
-                ) / max_inv_power * 100,
-                2,
-            )
-
-    # Phase Imbalance (Load)
-    if "loadPowerL1" in derived and "loadPowerL2" in derived:
-        max_load_power = max(abs(derived["loadPowerL1"]), abs(derived["loadPowerL2"]))
-        if max_load_power > 0:
-            derived["loadPhaseImbalancePercent"] = round(
-                abs(derived["loadPowerL1"] - derived["loadPowerL2"])
-                / max_load_power * 100,
-                2,
-            )
-
-    # Legacy phase power calculations (from INT32 registers if available)
-    if inverter_voltage and l1_current is not None:
-        derived["powerL1"] = round(inverter_voltage * l1_current, 2)
-
-    if inverter_voltage and l2_current is not None:
-        derived["powerL2"] = round(inverter_voltage * l2_current, 2)
-
-    if "powerL1" in derived and "powerL2" in derived:
-        max_power = max(abs(derived["powerL1"]), abs(derived["powerL2"]))
-        if max_power > 0:
-            derived["phaseImbalancePercent"] = round(
-                abs(derived["powerL1"] - derived["powerL2"]) / max_power * 100,
-                2
-            )
+    # we no longer calculate individual line powers; keep core metrics only
 
     return derived
 
@@ -371,58 +265,8 @@ def main():
             all_data.update(read_register_values(instrument, 20109, 5))
             all_data.update(read_register_values(instrument, 109, 5))
 
-            # Read phase currents (INT32)
-            l1_current = read_int32(instrument, 10120, 10)
-            l2_current = read_int32(instrument, 10122, 10)
+            # previously we read individual phase currents; no longer required
 
-            if l1_current is not None:
-                all_data["currentL1"] = l1_current
-
-            if l2_current is not None:
-                all_data["currentL2"] = l2_current
-
-            # attempt to discover correct line registers by scanning block
-            def auto_detect_lines():
-                try:
-                    regs = instrument.read_registers(25201, 100)
-                except Exception:
-                    return
-                # try both 0.1 and 0.01 scalings
-                scaled10 = [r * 0.1 for r in regs]
-                scaled01 = [r * 0.01 for r in regs]
-                power = all_data.get("inverterPower") or all_data.get("loadPower") or 0
-                best = None
-                best_err = float("inf")
-                n = len(regs)
-                for i in range(n):
-                    v1 = scaled10[i]
-                    if not (50 < v1 < 130):
-                        continue
-                    for j in range(i + 1, n):
-                        v2 = scaled10[j]
-                        if not (50 < v2 < 130):
-                            continue
-                        for a in range(n):
-                            i1 = scaled01[a]
-                            if not (0 <= i1 < 30):
-                                continue
-                            for b in range(a + 1, n):
-                                i2 = scaled01[b]
-                                if not (0 <= i2 < 30):
-                                    continue
-                                est = v1 * i1 + v2 * i2
-                                err = abs(est - power)
-                                if err < best_err:
-                                    best_err = err
-                                    best = (i, j, a, b, v1, v2, i1, i2)
-                if best:
-                    i, j, a, b, v1, v2, i1, i2 = best
-                    base = 25201
-                    all_data["inverterVoltageL1"] = v1
-                    all_data["inverterVoltageL2"] = v2
-                    all_data["inverterCurrentL1"] = i1
-                    all_data["inverterCurrentL2"] = i2
-            auto_detect_lines()
 
             derived_data = calculate_derived_metrics(all_data)
             all_data.update(derived_data)

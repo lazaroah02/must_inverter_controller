@@ -11,7 +11,6 @@ from inverter_monitor import (
     SERTIMEOUT,
     SERBAUD,
     SERPORT,
-    read_int32,
     calculate_derived_metrics,
     INTERVAL
 )
@@ -91,13 +90,7 @@ async def modbus_loop():
             all_data.update(read_register_values(instrument, 20109, 5))
             all_data.update(read_register_values(instrument, 109, 5))
 
-            l1_current = read_int32(instrument, 10120, 10)
-            l2_current = read_int32(instrument, 10122, 10)
-
-            if l1_current is not None:
-                all_data["currentL1"] = l1_current
-            if l2_current is not None:
-                all_data["currentL2"] = l2_current
+            # individual phase currents are not monitored any more
 
             derived_data = calculate_derived_metrics(all_data)
             all_data.update(derived_data)
@@ -137,3 +130,4 @@ def get_data():
 @app.get("/", response_class=HTMLResponse)
 async def read_dashboard(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
