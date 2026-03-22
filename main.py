@@ -35,7 +35,7 @@ def ensure_venv(root_dir):
     req_file = os.path.join(root_dir, "requirements.txt")
     if os.path.exists(req_file):
         print("Installing/updating dependencies...")
-        subprocess.check_call([python_exec, "-m", "pip", "install", "--upgrade", "-r", req_file])
+        #subprocess.check_call([python_exec, "-m", "pip", "install", "--upgrade", "-r", req_file])
         print("Dependencies ready.")
     else:
         print("No requirements.txt found.")
