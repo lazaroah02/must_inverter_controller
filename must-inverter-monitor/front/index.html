@@ -545,6 +545,46 @@
         font-size: 1.2rem;
         color: #e2e8f0;
       }
+
+      /*Battery Percentage representation styles*/
+      .circle {
+        position: relative;
+        width: 140px;
+        height: 140px;
+        margin: auto;
+        padding: 15px;
+      }
+
+      svg {
+        transform: rotate(-90deg);
+      }
+
+      circle {
+        fill: none;
+        stroke-width: 12;
+      }
+
+      .bg {
+        stroke: #e5e7eb;
+      }
+
+      .progress {
+        stroke: green;
+        stroke-linecap: round;
+        stroke-dasharray: 251.3; /* 2πr = 2 * 3.1416 * 60 */
+        stroke-dashoffset: 251.3;
+        transition: stroke-dashoffset 0.6s ease;
+      }
+
+      .percentage {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 24px;
+        font-weight: bold;
+        color: green;
+      }
     </style>
   </head>
   <body>
@@ -611,16 +651,12 @@
         <h2>🏠 Inverter Status</h2>
         <div class="cards">
           <div class="card">
-            <h3>
-              One Line (APROX) 
-            </h3>
+            <h3>One Line (APROX)</h3>
             <p id="oneLineLoadPower"></p>
             <p id="oneLineLoadPercent"></p>
           </div>
           <div class="card">
-            <h3>
-              Other Line (APROX)
-            </h3>
+            <h3>Other Line (APROX)</h3>
             <p id="otherLineLoadPower"></p>
             <p id="otherLineLoadPercent"></p>
           </div>
@@ -659,6 +695,24 @@
               >
             </h3>
             <p id="batteryVoltage">--V</p>
+          </div>
+          <div class="card">
+            <h3>Battery Percentage (APROX)</h3>
+
+            <div class="circle">
+              <svg width="110" height="110">
+                <circle cx="55" cy="55" r="40" class="bg" />
+                <circle
+                  id="progressCircle"
+                  cx="55"
+                  cy="55"
+                  r="40"
+                  class="progress"
+                />
+              </svg>
+
+              <div id="batteryPercentage" class="percentage">--%</div>
+            </div>
           </div>
           <div class="card">
             <h3>
@@ -766,7 +820,6 @@
           </div>
         </div>
       </div>
-
     </main>
 
     <script>
@@ -794,7 +847,7 @@
         loadPercent,
       }) {
         const eachLineTotalCapacity = 3000; //capacity in watts
-        const adjustmentPercentFactor = 3.5
+        const adjustmentPercentFactor = 3.5;
 
         const oneLineAjustedLoadPercent = loadPercent - adjustmentPercentFactor;
         let oneLineConsumption =
@@ -803,19 +856,20 @@
         let otherLineConsumption = totalLoadPower - oneLineConsumption;
         let otherLineLoadPercent =
           (otherLineConsumption / eachLineTotalCapacity) * 100;
-          
+
         //adjusting this percent to meet the real one. Error rate +- 2
-        let otherLineLoadPercentAdjusted = otherLineLoadPercent + adjustmentPercentFactor/2 
+        let otherLineLoadPercentAdjusted =
+          otherLineLoadPercent + adjustmentPercentFactor / 2;
 
         // validating values
-        if(otherLineConsumption < 0){
-          oneLineConsumption = totalLoadPower
-          otherLineConsumption = 0
-          otherLineLoadPercent = 0
-          otherLineLoadPercentAdjusted = 0
+        if (otherLineConsumption <= 5) {
+          oneLineConsumption = totalLoadPower;
+          otherLineConsumption = 0;
+          otherLineLoadPercent = 0;
+          otherLineLoadPercentAdjusted = 0;
         }
 
-        return ({
+        return {
           oneLine: {
             loadPercent: loadPercent,
             consumptionInWatts: oneLineConsumption,
@@ -824,7 +878,20 @@
             loadPercent: otherLineLoadPercentAdjusted.toFixed(0),
             consumptionInWatts: otherLineConsumption,
           },
-        });
+        };
+      }
+
+      function batteryPercentage(voltage) {
+        const min = 51;
+        const max = 56.5;
+        const k = 0.21;
+
+        const normalized = (voltage - min) / (max - min);
+
+        if (normalized <= 0) return 0;
+        if (normalized >= 1) return 100;
+
+        return Math.pow(normalized, k) * 100;
       }
 
       // Main update function
@@ -949,6 +1016,17 @@
           data.batteryPower || 0,
         );
 
+        // Battery Percentage representation
+        const currentVoltage = data.batteryVoltage 
+        const percent = batteryPercentage(currentVoltage);
+        document.getElementById("batteryPercentage").textContent =
+          percent.toFixed(0) + "%";
+        const circle = document.getElementById("progressCircle");
+        const radius = 40;
+        const circumference = 2 * Math.PI * radius;
+        const offset = circumference * (1 - percent / 100);
+        circle.style.strokeDashoffset = offset;
+
         // Grid
         document.getElementById("gridVoltageCard").textContent =
           (data.gridVoltage || 0).toFixed(1) + "V";
@@ -982,15 +1060,22 @@
         document.getElementById("loadPower").textContent = formatPower(
           data.loadPower || 0,
         );
-        
-        const calculatedLinesConsumption = calculateDerivatedLinesConsumption(
-          {loadPercent:data.loadPercent, totalLoadPower:data.loadPower}
-        )
 
-        document.getElementById("oneLineLoadPower").textContent = formatPower(calculatedLinesConsumption.oneLine.consumptionInWatts)
-        document.getElementById("otherLineLoadPower").textContent = formatPower(calculatedLinesConsumption.otherLine.consumptionInWatts) 
-        document.getElementById("oneLineLoadPercent").textContent = calculatedLinesConsumption.oneLine.loadPercent + "%"
-        document.getElementById("otherLineLoadPercent").textContent = calculatedLinesConsumption.otherLine.loadPercent + "%" 
+        const calculatedLinesConsumption = calculateDerivatedLinesConsumption({
+          loadPercent: data.loadPercent,
+          totalLoadPower: data.loadPower,
+        });
+
+        document.getElementById("oneLineLoadPower").textContent = formatPower(
+          calculatedLinesConsumption.oneLine.consumptionInWatts,
+        );
+        document.getElementById("otherLineLoadPower").textContent = formatPower(
+          calculatedLinesConsumption.otherLine.consumptionInWatts,
+        );
+        document.getElementById("oneLineLoadPercent").textContent =
+          calculatedLinesConsumption.oneLine.loadPercent + "%";
+        document.getElementById("otherLineLoadPercent").textContent =
+          calculatedLinesConsumption.otherLine.loadPercent + "%";
       }
 
       // Fetch data
