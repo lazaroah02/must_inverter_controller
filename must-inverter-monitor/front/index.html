@@ -219,7 +219,8 @@
       }
 
       @keyframes pulse {
-        0%, 100% {
+        0%,
+        100% {
           opacity: 1;
         }
         50% {
@@ -322,7 +323,8 @@
           grid-template-columns: 1fr 1fr;
         }
 
-        .card p, .line-metric span:last-child {
+        .card p,
+        .line-metric span:last-child {
           font-size: 1.2rem;
         }
       }
@@ -480,7 +482,8 @@
           font-size: 0.85rem;
         }
 
-        .warning-box, .success-box {
+        .warning-box,
+        .success-box {
           padding: 0.75rem;
           font-size: 0.8rem;
           margin-top: 0.75rem;
@@ -509,7 +512,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0,0,0,0.6);
+        background: rgba(0, 0, 0, 0.6);
         display: none;
         align-items: center;
         justify-content: center;
@@ -522,7 +525,7 @@
         border-radius: 8px;
         max-width: 500px;
         width: 90%;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
         position: relative;
       }
       .modal h3 {
@@ -580,7 +583,10 @@
 
       <!-- Power Flow Section -->
       <div class="group">
-        <h2>⚡ Power Flow <span class="info-icon" onclick="showInfo('powerFlow')">❔</span></h2>
+        <h2>
+          ⚡ Power Flow
+          <span class="info-icon" onclick="showInfo('powerFlow')">❔</span>
+        </h2>
         <div class="power-flow">
           <div class="power-source">
             <div class="power-source-icon" id="pvIcon">☀️</div>
@@ -590,8 +596,7 @@
           <div class="flow-center">
             <div class="power-source-icon">⚡</div>
             <strong>Inverter</strong>
-            <div id="flowLoad" style="color: #94a3b8">Load: 0W</div>
-            <div id="load-percent">--%</div>
+            <div id="flowLoad" style="color: #94a3b8">Total Load: 0W</div>
           </div>
           <div class="power-source">
             <div class="power-source-icon" id="batteryIcon">🔋</div>
@@ -601,100 +606,167 @@
         </div>
       </div>
 
-      <!-- System Health -->
+      <!-- Inverter Status -->
       <div class="group">
-        <h2>🏥 System Health <span class="info-icon" onclick="showInfo('systemHealth')">❔</span></h2>
+        <h2>🏠 Inverter Status</h2>
         <div class="cards">
+          <div class="card">
+            <h3>
+              One Line 
+            </h3>
+            <p id="oneLineLoadPower"></p>
+            <p id="oneLineLoadPercent"></p>
+          </div>
+          <div class="card">
+            <h3>
+              Other Line
+            </h3>
+            <p id="otherLineLoadPower"></p>
+            <p id="otherLineLoadPercent"></p>
+          </div>
+          <div class="card">
+            <h3>
+              Total Load Power
+              <span class="info-icon" onclick="showInfo('loadPower')">❔</span>
+            </h3>
+            <p id="loadPower">--W</p>
+          </div>
           <div class="card">
             <h3>Temperature</h3>
             <p id="tempStatus">--°C</p>
           </div>
           <div class="card">
-            <h3>Inverter Voltage <span class="info-icon" onclick="showInfo('inverterVoltage')">❔</span></h3>
+            <h3>
+              Inverter Voltage
+              <span class="info-icon" onclick="showInfo('inverterVoltage')"
+                >❔</span
+              >
+            </h3>
             <p id="inverterVoltage">--V</p>
-          </div>
-          <div class="card">
-            <h3>Grid Voltage</h3>
-            <p id="gridVoltage">--V</p>
-          </div>
-          <div class="card">
-            <h3>Battery Voltage <span class="info-icon" onclick="showInfo('batteryVoltage')">❔</span></h3>
-            <p id="batteryVoltage">--V</p>
-          </div>
-          <div class="card">
-            <h3>Battery Current <span class="info-icon" onclick="showInfo('batteryCurrent')">❔</span></h3>
-            <p id="batteryCurrent">--A</p>
-          </div>
-          <div class="card">
-            <h3>Battery Power <span class="info-icon" onclick="showInfo('batteryPower')">❔</span></h3>
-            <p id="batteryPower">--W</p>
           </div>
         </div>
       </div>
 
-      <!-- Grid Section -->
-      <!-- Grid Section -->
-      <!-- Grid Section -->
-      <!-- Grid Section -->
+      <!-- Battery Status -->
       <div class="group">
-        <h2>🌐 Grid Status <span class="info-icon" onclick="showInfo('grid')">❔</span></h2>
+        <h2>🔋 Battery Status</h2>
         <div class="cards">
           <div class="card">
-            <h3>Grid Voltage <span class="info-icon" onclick="showInfo('gridVoltage')">❔</span></h3>
-            <p id="gridVoltageCard">--V</p>
+            <h3>
+              Battery Voltage
+              <span class="info-icon" onclick="showInfo('batteryVoltage')"
+                >❔</span
+              >
+            </h3>
+            <p id="batteryVoltage">--V</p>
           </div>
           <div class="card">
-            <h3>Grid Current <span class="info-icon" onclick="showInfo('gridCurrent')">❔</span></h3>
-            <p id="gridCurrent">--A</p>
+            <h3>
+              Battery Current
+              <span class="info-icon" onclick="showInfo('batteryCurrent')"
+                >❔</span
+              >
+            </h3>
+            <p id="batteryCurrent">--A</p>
           </div>
           <div class="card">
-            <h3>Grid Power <span class="info-icon" onclick="showInfo('gridPower')">❔</span></h3>
-            <p id="gridPowerCard">--W</p>
-          </div>
-          <div class="card">
-            <h3>Grid Frequency <span class="info-icon" onclick="showInfo('gridFrequency')">❔</span></h3>
-            <p id="gridFrequency">--Hz</p>
+            <h3>
+              Battery Power
+              <span class="info-icon" onclick="showInfo('batteryPower')"
+                >❔</span
+              >
+            </h3>
+            <p id="batteryPower">--W</p>
           </div>
         </div>
       </div>
 
       <!-- Solar Section -->
       <div class="group">
-        <h2>☀️ Solar Charger <span class="info-icon" onclick="showInfo('solar')">❔</span></h2>
+        <h2>
+          ☀️ Solar Charger
+          <span class="info-icon" onclick="showInfo('solar')">❔</span>
+        </h2>
         <div class="cards">
           <div class="card">
-            <h3>MPPT State <span class="info-icon" onclick="showInfo('MpptState')">❔</span></h3>
+            <h3>
+              MPPT State
+              <span class="info-icon" onclick="showInfo('MpptState')">❔</span>
+            </h3>
             <p id="MpptState">--</p>
           </div>
           <div class="card">
-            <h3>PV Voltage <span class="info-icon" onclick="showInfo('PvVoltage')">❔</span></h3>
+            <h3>
+              PV Voltage
+              <span class="info-icon" onclick="showInfo('PvVoltage')">❔</span>
+            </h3>
             <p id="PvVoltage">--V</p>
           </div>
           <div class="card">
-            <h3>Charger Current <span class="info-icon" onclick="showInfo('chChargerCurrent')">❔</span></h3>
+            <h3>
+              Charger Current
+              <span class="info-icon" onclick="showInfo('chChargerCurrent')"
+                >❔</span
+              >
+            </h3>
             <p id="chChargerCurrent">--A</p>
           </div>
           <div class="card">
-            <h3>Solar Power <span class="info-icon" onclick="showInfo('ChargerPower')">❔</span></h3>
+            <h3>
+              Solar Power
+              <span class="info-icon" onclick="showInfo('ChargerPower')"
+                >❔</span
+              >
+            </h3>
             <p id="ChargerPower">--W</p>
           </div>
         </div>
       </div>
 
-      <!-- Load Summary -->
+      <!-- Grid Section -->
       <div class="group">
-        <h2>🏠 Load Summary <span class="info-icon" onclick="showInfo('loadSummary')">❔</span></h2>
+        <h2>
+          🌐 Grid Status
+          <span class="info-icon" onclick="showInfo('grid')">❔</span>
+        </h2>
         <div class="cards">
           <div class="card">
-            <h3>Total Load Power <span class="info-icon" onclick="showInfo('loadPower')">❔</span></h3>
-            <p id="loadPower">--W</p>
+            <h3>
+              Grid Voltage
+              <span class="info-icon" onclick="showInfo('gridVoltage')"
+                >❔</span
+              >
+            </h3>
+            <p id="gridVoltageCard">--V</p>
           </div>
           <div class="card">
-            <h3>Load Percent <span class="info-icon" onclick="showInfo('loadPercent')">❔</span></h3>
-            <p id="loadPercent">--%</p>
+            <h3>
+              Grid Current
+              <span class="info-icon" onclick="showInfo('gridCurrent')"
+                >❔</span
+              >
+            </h3>
+            <p id="gridCurrent">--A</p>
+          </div>
+          <div class="card">
+            <h3>
+              Grid Power
+              <span class="info-icon" onclick="showInfo('gridPower')">❔</span>
+            </h3>
+            <p id="gridPowerCard">--W</p>
+          </div>
+          <div class="card">
+            <h3>
+              Grid Frequency
+              <span class="info-icon" onclick="showInfo('gridFrequency')"
+                >❔</span
+              >
+            </h3>
+            <p id="gridFrequency">--Hz</p>
           </div>
         </div>
       </div>
+
     </main>
 
     <script>
@@ -717,56 +789,114 @@
         return Math.round(watts) + " W";
       }
 
+      function calculateDerivatedLinesConsumption({
+        totalLoadPower,
+        loadPercent,
+      }) {
+        const eachLineTotalCapacity = 3000; //capacity in watts
+        const adjustmentPercentFactor = 3.5
+
+        const oneLineAjustedLoadPercent = loadPercent - adjustmentPercentFactor;
+        let oneLineConsumption =
+          (oneLineAjustedLoadPercent / 100) * eachLineTotalCapacity;
+
+        let otherLineConsumption = totalLoadPower - oneLineConsumption;
+        let otherLineLoadPercent =
+          (otherLineConsumption / eachLineTotalCapacity) * 100;
+          
+        //adjusting this percent to meet the real one. Error rate +- 2
+        let otherLineLoadPercentAdjusted = otherLineLoadPercent + adjustmentPercentFactor/2 
+
+        // validating values
+        if(otherLineConsumption < 0){
+          oneLineConsumption = totalLoadPower
+          otherLineConsumption = 0
+          otherLineLoadPercent = 0
+          otherLineLoadPercentAdjusted = 0
+        }
+
+        return ({
+          oneLine: {
+            loadPercent: loadPercent,
+            consumptionInWatts: oneLineConsumption,
+          },
+          otherLine: {
+            loadPercent: otherLineLoadPercentAdjusted.toFixed(0),
+            consumptionInWatts: otherLineConsumption,
+          },
+        });
+      }
+
       // Main update function
       function showInfo(section) {
         const messages = {
-          powerFlow: "Shows flow of energy between solar, battery, grid and load. Arrows animate in direction of current power delivery.",
-          systemHealth: "Basic health metrics: temperatures, voltages, and battery statistics. Green/blue values are safe; orange/red warn of out-of-range.",
-          lines: "Detailed per-line output and load values. Useful to spot imbalances or missing voltage/current readings.",
+          powerFlow:
+            "Shows flow of energy between solar, battery, grid and load. Arrows animate in direction of current power delivery.",
+          systemHealth:
+            "Basic health metrics: temperatures, voltages, and battery statistics. Green/blue values are safe; orange/red warn of out-of-range.",
+          lines:
+            "Detailed per-line output and load values. Useful to spot imbalances or missing voltage/current readings.",
           grid: "Grid section displays the voltage/current/power coming from or going to the utility grid. Negative power means grid is supplying energy.",
-          solar: "Solar charger panel measurements: MPPT state, PV voltage and charger power. Zero power means no sun or MPPT off.",
-          loadSummary: "Aggregated load info. Calculates total voltage and current across both lines.",
-          MpptState: "Maximum Power Point Tracking status. 'Stop' means no solar activity, 'MPPT' means searching for optimal PV voltage.",
-          PvVoltage: "Voltage from the solar panels to the charger; reflects panel output under current illumination.",
-          chChargerCurrent: "Current delivered by the solar charger to the battery; high only when MPPT active.",
+          solar:
+            "Solar charger panel measurements: MPPT state, PV voltage and charger power. Zero power means no sun or MPPT off.",
+          loadSummary:
+            "Aggregated load info. Calculates total voltage and current across both lines.",
+          MpptState:
+            "Maximum Power Point Tracking status. 'Stop' means no solar activity, 'MPPT' means searching for optimal PV voltage.",
+          PvVoltage:
+            "Voltage from the solar panels to the charger; reflects panel output under current illumination.",
+          chChargerCurrent:
+            "Current delivered by the solar charger to the battery; high only when MPPT active.",
           ChargerPower: "Instantaneous solar power entering the system.",
-          batteryVoltage: "Voltage of the battery bank; used to estimate state-of-charge.",
-          batteryCurrent: "Positive when discharging, negative when charging (from battery perspective).",
-          batteryPower: "Real power into or out of battery; sign indicates direction.",
+          batteryVoltage:
+            "Voltage of the battery bank; used to estimate state-of-charge.",
+          batteryCurrent:
+            "Positive when discharging, negative when charging (from battery perspective).",
+          batteryPower:
+            "Real power into or out of battery; sign indicates direction.",
           loadPower: "Total power consumed by the house loads.",
           loadPercent: "Percentage of inverter capacity currently used.",
-          inverterVoltage: "Output voltage of the inverter; should match grid when tied.",
-          inverterFrequency: "Output frequency; typically 50 or 60Hz and should match grid.",
+          inverterVoltage:
+            "Output voltage of the inverter; should match grid when tied.",
+          inverterFrequency:
+            "Output frequency; typically 50 or 60Hz and should match grid.",
           gridVoltage: "Voltage provided by the utility grid.",
-          gridCurrent: "Current drawn from or sent to the grid (negative sign means grid supplying).",
-          gridPower: "Net power exchanged with grid; negative indicates import.",
+          gridCurrent:
+            "Current drawn from or sent to the grid (negative sign means grid supplying).",
+          gridPower:
+            "Net power exchanged with grid; negative indicates import.",
           gridFrequency: "Frequency of the grid supply.",
         };
-        const title = section.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-        document.getElementById('modalTitle').textContent = title;
-        document.getElementById('modalText').textContent = messages[section] || "No help available for this item.";
-        document.getElementById('infoModal').style.display = 'flex';
+        const title = section
+          .replace(/([A-Z])/g, " $1")
+          .replace(/^./, (str) => str.toUpperCase());
+        document.getElementById("modalTitle").textContent = title;
+        document.getElementById("modalText").textContent =
+          messages[section] || "No help available for this item.";
+        document.getElementById("infoModal").style.display = "flex";
       }
       function hideModal() {
-        document.getElementById('infoModal').style.display = 'none';
+        document.getElementById("infoModal").style.display = "none";
       }
 
       function updateDashboard(data) {
         // Status Bar
         const modeMap = {
-          "PowerOn": "Power On",
-          "SelfTest": "Self Test",
-          "OffGrid": "Off Grid",
+          PowerOn: "Power On",
+          SelfTest: "Self Test",
+          OffGrid: "Off Grid",
           "Grid-Tie": "Grid Tie",
-          "Bypass": "Bypass Mode",
-          "Stop": "Stopped",
-          "Grid Charging": "Grid Charging"
+          Bypass: "Bypass Mode",
+          Stop: "Stopped",
+          "Grid Charging": "Grid Charging",
         };
 
         const mode = modeMap[data.workState] || data.workState || "--";
         const modeBadge = document.getElementById("modesStatus");
         modeBadge.textContent = mode;
-        modeBadge.className = "status-badge " + data.workState?.toLowerCase().replace(/ /g, "-") || "unknown";
+        modeBadge.className =
+          "status-badge " + data.workState?.toLowerCase().replace(/ /g, "-") ||
+          "unknown";
 
         // Battery Direction
         const batteryDir = data.batteryDirection || "unknown";
@@ -776,58 +906,91 @@
 
         // Power Source
         const powerSource = data.houseConsumptionSource || "unknown";
-        const sourceText = {
-          "grid": "Grid 🌐",
-          "battery": "Battery 🔋",
-          "solar": "Solar ☀️",
-          "mixed/low": "Mixed"
-        }[powerSource] || powerSource;
+        const sourceText =
+          {
+            grid: "Grid 🌐",
+            battery: "Battery 🔋",
+            solar: "Solar ☀️",
+            "mixed/low": "Mixed",
+          }[powerSource] || powerSource;
         document.getElementById("powerSourceStatus").textContent = sourceText;
 
         // Frequency Status
         const freqStatus = document.getElementById("frequencyStatus");
-        freqStatus.textContent = (data.gridFrequency || data.inverterFrequency || 0).toFixed(1);
-        if (Math.abs((data.gridFrequency || 0) - (data.inverterFrequency || 0)) > 0.5) {
+        freqStatus.textContent = (
+          data.gridFrequency ||
+          data.inverterFrequency ||
+          0
+        ).toFixed(1);
+        if (
+          Math.abs((data.gridFrequency || 0) - (data.inverterFrequency || 0)) >
+          0.5
+        ) {
           freqStatus.style.color = "#f97316";
         } else {
           freqStatus.style.color = "#22c55e";
         }
 
         // Power Flow
-        document.getElementById("pvPower").textContent = formatPower(data.ChargerPower || 0);
-        document.getElementById("batteryStatus").textContent = (data.batteryVoltage || 0).toFixed(1) + "V";
-        document.getElementById("flowLoad").textContent = "Load: " + formatPower(data.loadPower || 0);
+        document.getElementById("pvPower").textContent = formatPower(
+          data.ChargerPower || 0,
+        );
+        document.getElementById("batteryStatus").textContent =
+          (data.batteryVoltage || 0).toFixed(1) + "V";
+        document.getElementById("flowLoad").textContent =
+          "Total Load: " + formatPower(data.loadPower || 0);
 
-        // System Health
+        // Battery Status
+        document.getElementById("batteryVoltage").textContent =
+          (data.batteryVoltage || 0).toFixed(1) + "V";
+        document.getElementById("batteryCurrent").textContent =
+          (data.batteryCurrent || 0).toFixed(1) + "A";
+        document.getElementById("batteryPower").textContent = formatPower(
+          data.batteryPower || 0,
+        );
+
+        // Grid
+        document.getElementById("gridVoltageCard").textContent =
+          (data.gridVoltage || 0).toFixed(1) + "V";
+        document.getElementById("gridCurrent").textContent =
+          (data.gridCurrent || 0).toFixed(1) + "A";
+        document.getElementById("gridPowerCard").textContent = formatPower(
+          data.gridPower || 0,
+        );
+        document.getElementById("gridFrequency").textContent =
+          (data.gridFrequency || 0).toFixed(2) + " Hz";
+
+        // Solar
+        document.getElementById("MpptState").textContent =
+          data.MpptState || "--";
+        document.getElementById("PvVoltage").textContent =
+          (data.PvVoltage || 0).toFixed(1) + "V";
+        document.getElementById("chChargerCurrent").textContent =
+          (data.chChargerCurrent || 0).toFixed(1) + "A";
+        document.getElementById("ChargerPower").textContent = formatPower(
+          data.ChargerPower || 0,
+        );
+
+        // Inverter Status
         const temp = data.acRadiatorTemperature || 0;
         const tempElement = document.getElementById("tempStatus");
         tempElement.textContent = temp + "°C";
         tempElement.style.color = getTemperatureColor(temp);
 
-        document.getElementById("inverterVoltage").textContent = (data.inverterVoltage || 0).toFixed(1) + "V";
-        document.getElementById("gridVoltage").textContent = (data.gridVoltage || 0).toFixed(1) + "V";
-        document.getElementById("batteryVoltage").textContent = (data.batteryVoltage || 0).toFixed(1) + "V";
-        document.getElementById("batteryCurrent").textContent = (data.batteryCurrent || 0).toFixed(1) + "A";
-        document.getElementById("batteryPower").textContent = formatPower(data.batteryPower || 0);
+        document.getElementById("inverterVoltage").textContent =
+          (data.inverterVoltage || 0).toFixed(1) + "V";
+        document.getElementById("loadPower").textContent = formatPower(
+          data.loadPower || 0,
+        );
+        
+        const calculatedLinesConsumption = calculateDerivatedLinesConsumption(
+          {loadPercent:data.loadPercent, totalLoadPower:data.loadPower}
+        )
 
-
-        // Grid
-        document.getElementById("gridVoltageCard").textContent = (data.gridVoltage || 0).toFixed(1) + "V";
-        document.getElementById("gridCurrent").textContent = (data.gridCurrent || 0).toFixed(1) + "A";
-        document.getElementById("gridPowerCard").textContent = formatPower(data.gridPower || 0);
-        document.getElementById("gridFrequency").textContent = (data.gridFrequency || 0).toFixed(2) + " Hz";
-
-        // Solar
-        document.getElementById("MpptState").textContent = data.MpptState || "--";
-        document.getElementById("PvVoltage").textContent = (data.PvVoltage || 0).toFixed(1) + "V";
-        document.getElementById("chChargerCurrent").textContent = (data.chChargerCurrent || 0).toFixed(1) + "A";
-        document.getElementById("ChargerPower").textContent = formatPower(data.ChargerPower || 0);
-
-        // Load
-        document.getElementById("loadPower").textContent = formatPower(data.loadPower || 0);
-        document.getElementById("loadPercent").textContent = (data.loadPercent || 0) + "%";
-        document.getElementById("load-percent").textContent = (data.loadPercent || 0) + "%";
-
+        document.getElementById("oneLineLoadPower").textContent = formatPower(calculatedLinesConsumption.oneLine.consumptionInWatts)
+        document.getElementById("otherLineLoadPower").textContent = formatPower(calculatedLinesConsumption.otherLine.consumptionInWatts) 
+        document.getElementById("oneLineLoadPercent").textContent = calculatedLinesConsumption.oneLine.loadPercent + "%"
+        document.getElementById("otherLineLoadPercent").textContent = calculatedLinesConsumption.otherLine.loadPercent + "%" 
       }
 
       // Fetch data
