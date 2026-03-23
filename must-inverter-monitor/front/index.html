@@ -846,6 +846,18 @@
         totalLoadPower,
         loadPercent,
       }) {
+        if(totalLoadPower == 0 || loadPercent == 0){
+          return {
+          oneLine: {
+            loadPercent: 0,
+            consumptionInWatts: 0,
+          },
+          otherLine: {
+            loadPercent: 0,
+            consumptionInWatts: 0,
+          },
+        };
+        }
         const eachLineTotalCapacity = 3000; //capacity in watts
         const adjustmentPercentFactor = 3.5;
 
