@@ -846,17 +846,17 @@
         totalLoadPower,
         loadPercent,
       }) {
-        if(totalLoadPower == 0 || loadPercent == 0){
+        if (totalLoadPower == 0 || loadPercent == 0) {
           return {
-          oneLine: {
-            loadPercent: 0,
-            consumptionInWatts: 0,
-          },
-          otherLine: {
-            loadPercent: 0,
-            consumptionInWatts: 0,
-          },
-        };
+            oneLine: {
+              loadPercent: 0,
+              consumptionInWatts: 0,
+            },
+            otherLine: {
+              loadPercent: 0,
+              consumptionInWatts: 0,
+            },
+          };
         }
         const eachLineTotalCapacity = 3000; //capacity in watts
         const adjustmentPercentFactor = 3.5;
@@ -893,17 +893,26 @@
         };
       }
 
-      function batteryPercentage(voltage) {
-        const min = 51;
-        const max = 56.9;
-        const k = 0.21;
+      function batteryPercentage(voltage, current) {
+        // R calculated from your sources (approximately 28.4 mOhms)
+        const R = 0.0284;
 
-        const normalized = (voltage - min) / (max - min);
+        // Calculate the voltage the battery would have if it were at rest (0A)
+        // If the current is negative (discharging), it will add voltage to compensate for the drop.
+        // If it is positive (charging), it will subtract the "excess" voltage.
+        const vCompensated = voltage - current * R;
+
+        // Curve parameters (adjusted for a 16-cell LiFePO4 battery)
+        const min = 52.4;
+        const max = 54.8;
+        const k = 0.8;
+
+        const normalized = (vCompensated - min) / (max - min);
 
         if (normalized <= 0) return 0;
         if (normalized >= 1) return 100;
 
-        return Math.pow(normalized, k) * 100;
+        return Math.round(Math.pow(normalized, k) * 100);
       }
 
       // Main update function
@@ -1029,8 +1038,9 @@
         );
 
         // Battery Percentage representation
-        const currentVoltage = data.batteryVoltage 
-        const percent = batteryPercentage(currentVoltage);
+        const currentVoltage = data.batteryVoltage;
+        const currentAmper = data.batteryCurrent;
+        const percent = batteryPercentage(currentVoltage, currentAmper);
         document.getElementById("batteryPercentage").textContent =
           percent.toFixed(0) + "%";
         const circle = document.getElementById("progressCircle");
